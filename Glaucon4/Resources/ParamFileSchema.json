@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema",
+  "title": "JSON Schema Glaucon parameter file",
+
+  "type": "object",
+
+  "properties": {
+    {
+      "$schema": "http://json-schema.org/draft-04/schema#",
+      "type": "object",
+      "properties": {
+        "StrainLimit": {
+          "type": "number"
+        },
+        "EquilibriumTolerance": {
+          "type": "number"
+        },
+        "EquilibriumError": {
+          "type": "number"
+        },
+        "MinEigenvalue": {
+          "type": "number"
+        },
+        "MaxEigenvalue": {
+          "type": "number"
+        },
+        "ModalConvergenceTol": {
+          "type": "number"
+        },
+        "ResidualTolerance": {
+          "type": "number"
+        },
+        "MaxVibrationTime": {
+          "type": "number"
+        },
+        "Analyze": {
+          "type": "boolean"
+        },
+        "DoModal": {
+          "type": "boolean"
+        },
+        "Validate": {
+          "type": "boolean"
+        },
+        "UnifLoadsLocal": {
+          "type": "number"
+        },
+        "OutputFormat": {
+          "type": "string"
+        },
+        "RenumNodes": {
+          "type": "integer"
+        },
+        "MaxSegmentCount": {
+          "type": "integer"
+        },
+        "AxialStrainWarning": {
+          "type": "integer"
+        },
+        "MinimumIterations": {
+          "type": "integer"
+        },
+        "MaximumIterations": {
+          "type": "integer"
+        },
+        "FrequenciesFound": {
+          "type": "integer"
+        },
+        "LoopCount": {
+          "type": "integer"
+        },
+        "Iterations": {
+          "type": "integer"
+        },
+        "Decimals": {
+          "type": "integer"
+        },
+        "ModalMethod": {
+          "type": "integer"
+        },
+        "InputPath": {
+          "type": "string"
+        },
+        "OutputPath": {
+          "type": "string"
+        },
+        "InputFileName": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "StrainLimit",
+        "EquilibriumTolerance",
+        "EquilibriumError",
+        "MinEigenvalue",
+        "MaxEigenvalue",
+        "ModalConvergenceTol",
+        "ResidualTolerance",
+        "MaxVibrationTime",
+        "Analyze",
+        "DoModal",
+        "Validate",
+        "UnifLoadsLocal",
+        "OutputFormat",
+        "RenumNodes",
+        "MaxSegmentCount",
+        "AxialStrainWarning",
+        "MinimumIterations",
+        "MaximumIterations",
+        "FrequenciesFound",
+        "LoopCount",
+        "Iterations",
+        "Decimals",
+        "ModalMethod",
+        "InputPath",
+        "OutputPath",
+        "InputFileName"
+      ]
+    }
+  }
+}

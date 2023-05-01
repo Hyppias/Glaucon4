@@ -1,0 +1,656 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "Version": {
+      "type": "string"
+    },
+    "Shear": {
+      "type": "boolean"
+    },
+    "Geom": {
+      "type": "boolean"
+    },
+    "Exagg_static": {
+      "type": "number"
+    },
+    "Scale": {
+      "type": "number"
+    },
+    "Dx": {
+      "type": "integer"
+    },
+    "Nodes": {
+      "type": "array",
+      "minimum": 2,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "Nr": {
+              "type": "integer"
+            },
+            "X": {
+              "type": "number"
+            },
+            "Y": {
+              "type": "number"
+            },
+            "Z": {
+              "type": "number"
+            },
+            "Radius": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "Nr",
+            "X",
+            "Y",
+            "Z",
+            "Radius"
+          ]        
+        }
+      ]
+    },
+    "ReactionData": {
+      "type": "array",
+      "minimum": 2,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "Nr": {
+              "type": "integer"
+            },
+            "Tx": {
+              "type": "integer"
+            },
+            "Ty": {
+              "type": "integer"
+            },
+            "Tz": {
+              "type": "integer"
+            },
+            "Rx": {
+              "type": "integer"
+            },
+            "Ry": {
+              "type": "integer"
+            },
+            "Rz": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "Nr",
+            "Tx",
+            "Ty",
+            "Tz",
+            "Rx",
+            "Ry",
+            "Rz"
+          ]
+        }
+      ]
+    },
+    "Members": {
+      "type": "array",
+      "minimum":  1,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "Nr": {
+              "type": "integer"
+            },
+            "NodeA": {
+              "type": "integer"
+            },
+            "NodeB": {
+              "type": "integer"
+            },
+            "Ax": {
+              "type": "number"
+            },
+            "Asy": {
+              "type": "number"
+            },
+            "Asz": {
+              "type": "number"
+            },
+            "Jx": {
+              "type": "number"
+            },
+            "Iy": {
+              "type": "number"
+            },
+            "Iz": {
+              "type": "number"
+            },
+            "E": {
+              "type": "number"
+            },
+            "G": {
+              "type": "number"
+            },
+            "Roll": {
+              "type": "number"
+            },
+            "Density": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "Nr",
+            "NodeA",
+            "NodeB",
+            "Ax",
+            "Asy",
+            "Asz",
+            "Jx",
+            "Iy",
+            "Iz",
+            "E",
+            "G",
+            "Roll",
+            "Density"
+          ]
+        }
+      ]
+    },
+    "LoadCases": {
+      "type": "array",
+      "minimum":  1,
+      "items": [
+        {
+          "type": "object",
+          "minimum": 1,
+          "maximum": 1,
+          "properties": {
+            "g": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "NodeForces": {
+              "type": "array",
+              "minimum": 0,
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "Nr": {
+                      "type": "integer"
+                    },
+                    "Tx": {
+                      "type": "number"
+                    },
+                    "Ty": {
+                      "type": "number"
+                    },
+                    "Tz": {
+                      "type": "number"
+                    },
+                    "Rx": {
+                      "type": "number"
+                    },
+                    "Ry": {
+                      "type": "number"
+                    },
+                    "Rz": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Nr",
+                    "Tx",
+                    "Ty",
+                    "Tz",
+                    "Rx",
+                    "Ry",
+                    "Rz"
+                  ]
+                }
+              ]
+            },
+            "UniformLoads": {
+              "type": "array",
+              "minimum": 0,
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "Nr": {
+                      "type": "integer"
+                    },
+                    "X": {
+                      "type": "number"
+                    },
+                    "Y": {
+                      "type": "number"
+                    },
+                    "Z": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "Nr",
+                    "X",
+                    "Y",
+                    "Z"
+                  ]
+                }
+              ]
+            },
+            "TrapLoads": {
+              "type": "array",
+              "minimum": 0,
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "Nr": {
+                      "type": "integer"
+                    },
+                    "Loads": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "Position": {
+                              "type": "object",
+                              "properties": {
+                                "a": {
+                                  "type": "number"
+                                },
+                                "b": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "a",
+                                "b"
+                              ]
+                            },
+                            "Load": {
+                              "type": "object",
+                              "properties": {
+                                "Wx1": {
+                                  "type": "number"
+                                },
+                                "Wx2": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "Wx1",
+                                "Wx2"
+                              ]
+                            }
+                          },
+                          "required": [
+                            "Position",
+                            "Load"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "Nr",
+                    "Loads"
+                  ]
+                }
+              ]
+            },
+            "InteriorForces": {
+              "type": "array",
+              "minimum": 0,
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "MemberNr": {
+                      "type": "integer"
+                    },
+                    "Forces": {
+                      "type": "array",
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "X": {
+                              "type": "number"
+                            },
+                            "Y": {
+                              "type": "number"
+                            },
+                            "Z": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "X",
+                            "Y",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "MemberNr",
+                    "Forces"
+                  ]
+                }
+              ]
+            },
+            "TemperatureChanges": {
+              "type": "array",
+              "minimum": 0,
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "MemberNr": {
+                      "type": "integer"
+                    },
+                    "Alpha": {
+                      "type": "number"
+                    },
+                    "Hy": {
+                      "type": "number"
+                    },
+                    "Hz": {
+                      "type": "number"
+                    },
+                    "Ty+": {
+                      "type": "number"
+                    },
+                    "Ty-": {
+                      "type": "number"
+                    },
+                    "Tz": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "MemberNr",
+                    "Alpha",
+                    "Hy",
+                    "Hz",
+                    "Ty+",
+                    "Ty-",
+                    "Tz"
+                  ]
+                }
+              ]
+            },
+            "PrescribedDisplacements": {
+              "type": "array",
+              "minimum": 0,
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "NodeNr": {
+                      "type": "integer"
+                    },
+                    "Translations": {
+                      "type": "array",
+                      "minimum": 1,
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "X": {
+                              "type": "number"
+                            },
+                            "Y": {
+                              "type": "number"
+                            },
+                            "Z": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "X",
+                            "Y",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    },
+                    "Rotations": {
+                      "type": "array",
+                      "minimum": 1,
+                      "items": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "X": {
+                              "type": "number"
+                            },
+                            "Y": {
+                              "type": "number"
+                            },
+                            "Z": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "X",
+                            "Y",
+                            "Z"
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "NodeNr",
+                    "Translations",
+                    "Rotations"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "g",
+            "NodeForces",
+            "UniformLoads",
+            "TrapLoads",
+            "InteriorForces",
+            "TemperatureChanges",
+            "PrescribedDisplacements"
+          ]
+        }
+      ]
+    },
+    "DynamicModes": {
+      "type": "integer"
+    },
+    "Mmethod": {
+      "type": "integer"
+    },
+    "LumpedMass": {
+      "type": "boolean"
+    },
+    "Tolerance": {
+      "type": "number"
+    },
+    "Shift": {
+      "type": "number"
+    },
+    "Param.DeformationExaggeration": {
+      "type": "integer"
+    },
+    "NodeInertials": {
+      "type": "array",
+      "minimum": 0,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "Node": {
+              "type": "integer"
+            },
+            "Mass": {
+              "type": "number"
+            },
+            "XX": {
+              "type": "number"
+            },
+            "YY": {
+              "type": "number"
+            },
+            "ZZ": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "Node",
+            "Mass",
+            "XX",
+            "YY",
+            "ZZ"
+          ]
+        }
+      ]
+    },
+    "ExtraMemberMasses": {
+      "type": "array",
+      "minimum": 0,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "MemberNr": {
+              "type": "integer"
+            },
+            "Mass": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "MemberNr",
+            "Mass"
+          ]
+        }
+      ]
+    },
+    "ModeShapeAnimationData": {
+      "type": "array",
+      "minimum": 0,
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "ModeNr": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "ModeNr"
+          ]
+        }
+      ]
+    },
+    "Cmethod": {
+      "type": "integer"
+    },
+    "CondensationMode": {
+      "type": "array",
+      "items": [
+        {
+          "type": "object",
+          "properties": {
+            "NodeNr": {
+              "type": "integer"
+            },
+            "Translations": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "X": {
+                      "type": "number"
+                    },
+                    "Y": {
+                      "type": "number"
+                    },
+                    "Z": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "X",
+                    "Y",
+                    "Z"
+                  ]
+                }
+              ]
+            },
+            "Rotations": {
+              "type": "array",
+              "items": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "X": {
+                      "type": "number"
+                    },
+                    "Y": {
+                      "type": "number"
+                    },
+                    "Z": {
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "X",
+                    "Y",
+                    "Z"
+                  ]
+                }
+              ]
+            }
+          },
+          "required": [
+            "NodeNr",
+            "Translations",
+            "Rotations"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "Version",
+    "Shear",
+    "Geom",
+    "Exagg_static",
+    "Scale",
+    "Dx",
+    "Nodes",
+    "ReactionData",
+    "Members",
+    "LoadCases",
+    "DynamicModes",    
+    "Tolerance",
+    "Shift"
+  ]
+}

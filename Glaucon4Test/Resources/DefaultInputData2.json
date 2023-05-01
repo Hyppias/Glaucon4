@@ -1,0 +1,99 @@
+﻿{
+  "Version": "1.0.0.0",
+  "Title":  "",
+  "Shear": true,
+  "GeometricStability": true,
+  "Exaggerate": 1.0,
+  "Scale": 1.0,
+  "Dx": 10,
+  "Nodes": [
+    {
+      "Nr": 0,
+      "Coord": [ 1.0, 1.0, 1.0 ]
+    }
+  ],
+  "ReactionData": [
+    {
+      "Nr": 0,
+      "Restraints": [ 0, 0, 0, 0, 0, 0 ]
+    }
+  ],
+  "Members": [
+    {
+      "Nr": 0,
+      "NodeA": 0,
+      "NodeB": 0,
+      "Stiffness": [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
+    }
+  ],
+  "LoadCases": [
+    {
+      "g": [ 1.0, 1.0, 1.0 ],
+      "NodeForces": [
+        {
+          "Nr": 0,
+          "Actions": [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
+        }
+      ],
+      "UnifLoads": [
+        {
+          "Nr": 0,
+          "Actions": [ 1.0, 1.0, 1.0 ]
+        }
+      ],
+      "TrapLoads": [
+        {
+          "Nr": 0,
+          "Loads": [ 1.0, 1.0, 1.0, 1.0 ]
+        }
+      ],
+      "InteriorForces": [
+        {
+          "MemberNr": 0,
+          "Forces": [ 1.0, 1.0, 1.0 ]
+        }
+      ],
+      "TemperatureChanges": [
+        {
+          "MemberNr": 0,
+          "Alpha": 0.1,
+          "Loads": [ 1.0, 1.0, 1.0, 1.0 ]
+        }
+      ],
+      "PrescribedDisplacements": [
+        {
+          "NodeNr": 0,
+          "Displacements": [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
+        }
+      ]
+    }
+  ],
+  "DynamicModes": 2,
+  "Mmethod": 1,
+  "LumpedMass": false,
+  "Tolerance": 1e-3,
+  "Shift": 2.0,
+  "ExaggerateModal": 3,
+  "NodeInertials": [
+    {
+      "NodeNr": 0,
+      "Mass": 20.0,
+      "Inertials": [ 20.0, 10.0, 10.0 ]
+    }
+  ],
+  "ExtraMemberMasses": [
+    {
+      "MemberNr": 1,
+      "Mass": 12.4
+    }
+  ],
+  "ModeShapeAnimationData": [ 1, 23 ],
+  "CondensationMethod": 1,
+  "CondensationMode": [
+    {
+      "NodeNr": 0,
+      "Modes": [ 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 ]
+    }
+  ]
+}
+
