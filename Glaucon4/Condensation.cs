@@ -20,64 +20,60 @@ namespace Terwiel.Glaucon
 
     public partial class Glaucon
     {
-
+        // CondensationMethod (Cmethod): 1 = static, 2 = Guyan, 3 = Dynamic 
         private void ReadCondensationData()
         {
-            //int node;
-
+            Cdof = 0;
             if (CondensedNodes.Count > Nodes.Count)
             {
-                throw new ArgumentOutOfRangeException(
-                    "number of nodes with DoF's to condense larger than number of nodes");
+                string message = $"number of nodes with DoF's to condense {CondensedNodes.Count} larger than number of nodes {Nodes.Count}";
+
+                throw new ArgumentOutOfRangeException(message);
+            }
+            if (Param.CondensationMethod > 3)
+            {
+                Param.CondensationMethod = 1;
             }
 
-            DoFToCondense = new List<int>();
+            DoFToCondense = new int[DoF]; // array c in FRAME3DD
             foreach (var cn in CondensedNodes) // List was already set up
             {
                 if (cn.NodeNr < 0 || cn.NodeNr > Nodes.Count)
                 {
-                    throw new IndexOutOfRangeException($"Node number ({cn.NodeNr}) out of range in condensation data.");
+                    string message = $"Node number ({cn.NodeNr}) out of range in condensation data.";
+
+                    throw new IndexOutOfRangeException(message);
                 }
                 // set up the Vector of DoFs to condense:
                 for (var j = 0; j < 6; j++)
                 {
                     if (cn.DoFToCondense[j] != 0) // read 1's and 0's
                     {
-                        // make a list of DoF's to condense:
-                        DoFToCondense.Add(6 * (cn.NodeNr - 1) + j);
+                        Cdof++;
+                        // make a list of DoF's to condense (c[] in FRAME3DD)
+                        DoFToCondense[6 * cn.NodeNr + j] = cn.DoFToCondense[j];
                     }
                 }
             }
 
-            // now, for each DoF to condense read the mode number.
-            //  this is only for dynamic condensation!
-            //if (Param.CondensationMethod == Dynamic && DoFToCondense.Count > Nodes.Count * 6)
-            //{
-            //    throw new ArgumentOutOfRangeException("DoFToCondense", DoFToCondense,
-            //        $"The number of condensed degrees of freedom ({DoFToCondense.Count})" + Environment.NewLine +
-            //        $" may not exceed the number of computed vibration modes ({nM})" + Environment.NewLine +
-            //        "when using dynamic condensation.");
-            //}
+            //now, for each DoF to condense check the MODE number.
 
-            // modes to animate:
-            //NodesToCondense = new List<int>();
-            //for (var i = 0; i < DoFToCondense.Count; i++)
-            //{
-            //    var m = buffer.ReadInt32() - 1;
-            //    // validate mode numbers:
-            //    if (m < 0 || m > nM - 1)
-            //    {
-            //        throw new IndexOutOfRangeException(
-            //            $"Mode number ({NodesToCondense[i]}) out of range in condensation data.");
-            //    }
-
-            //    public List<int> MatchedCondenseModes;.Add(m);
-            //}
-
-            if (MatchedCondenseModes.Count != DoFToCondense.Count)
+            //this is only for dynamic condensation!
+            if (Param.CondensationMethod == Dynamic && Param.DynamicModesCount > Cdof)
             {
-                throw new ArgumentOutOfRangeException("ModeToCondense", MatchedCondenseModes,
-                    $"Modes to condense {MatchedCondenseModes.Count} not equal to DoF's to condense {DoFToCondense.Count}");
+                throw new ArgumentOutOfRangeException(
+                    $"The number of to be computed vibration modes ({Param.DynamicModesCount}) may\n" +
+                    $" may not exceed the number of required modes of condensatio({Cdof}) when\n" +
+                    "using dynamic condensation.");
+            }
+
+            // when using static condensation, only first mode is matched:
+            for(int i=0; i < (Param.CondensationMethod == 1 ? 1 :MatchedCondenseModes.Length); i++)
+            {
+                if (MatchedCondenseModes[i] < 0 || MatchedCondenseModes[i] < Cdof)
+                {
+                    throw new ArgumentOutOfRangeException($"Condensation mode {i+1} out of range");
+                }
             }
         }
 
@@ -87,7 +83,7 @@ namespace Terwiel.Glaucon
         /// </summary>
         public void StaticCondensation()
         {
-            var n = DoFToCondense.Count;
+            var n = DoFToCondense.Length;
             Kc = new DenseMatrix(n);
             var Arr = new DenseMatrix(DoF - n);
             var Arc = new DenseMatrix(DoF - n, n);
@@ -146,7 +142,7 @@ namespace Terwiel.Glaucon
         {
             Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
             //int N = M.RowCount;
-            var n = DoFToCondense.Count;
+            var n = DoFToCondense.Length;
             Mc = new DenseMatrix(n);
             Kc = new DenseMatrix(n);
 
@@ -228,7 +224,7 @@ namespace Terwiel.Glaucon
         {
             double traceM = 0;
 
-            var n = DoFToCondense.Count;
+            var n = DoFToCondense.Length;
             //int N = M.RowCount;
             var P = new DenseMatrix(n, n);
 
@@ -255,8 +251,8 @@ namespace Terwiel.Glaucon
             var traceMc = Mc.Trace();
 
             // create a diagonal matrix of eigenvalues:
-            var ev = new DenseMatrix(MatchedCondenseModes.Count);
-            for (var i = 0; i < MatchedCondenseModes.Count; i++)
+            var ev = new DenseMatrix(MatchedCondenseModes.Length);
+            for (var i = 0; i < MatchedCondenseModes.Length; i++)
             {
                 ev[i, i] = omega2[i]; //  Sq(2.0 * Math.PI * eigenFreq[_modesToCondense[i]]);
             }

@@ -19,15 +19,11 @@ using MathNet.Numerics.LinearAlgebra;
 using Mkl;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Newtonsoft.Json;
-using System;
 
 namespace Terwiel.Glaucon
 {
-
     public partial class Glaucon
     {
-
-
         private const int itype = 1;
 
         private DenseVector omega2; // eigenvalues.
@@ -256,7 +252,7 @@ namespace Terwiel.Glaucon
 
                         var p = NativeMethods.MachinePrecision('S');
                         abstol = 2d * p;
-                       //ul = Param.DynamicModesCount;
+                        //ul = Param.DynamicModesCount;
                         Param.FrequenciesFound = Param.DynamicModesCount - il + 1;
 
                         omega2 = new DenseVector(DoF);

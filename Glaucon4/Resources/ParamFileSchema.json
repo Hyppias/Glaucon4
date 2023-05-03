@@ -35,10 +35,7 @@
         },
         "Analyze": {
           "type": "boolean"
-        },
-        "DoModal": {
-          "type": "boolean"
-        },
+        },       
         "Validate": {
           "type": "boolean"
         },
@@ -98,7 +95,6 @@
         "ResidualTolerance",
         "MaxVibrationTime",
         "Analyze",
-        "DoModal",
         "Validate",
         "UnifLoadsLocal",
         "OutputFormat",

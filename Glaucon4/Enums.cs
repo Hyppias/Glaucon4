@@ -16,7 +16,7 @@ namespace Terwiel.Glaucon
     {
         X = 0,
         Y = 1,
-        Z = 3
+        Z = 2
     }
 
     public partial class Glaucon

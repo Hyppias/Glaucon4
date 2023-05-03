@@ -1,18 +1,12 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestC.cs
-// Date: 2021-09-08
-// Created date: 2019-12-15
-// Created time:-7:30 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestC.cs
+// Last write: 5/3/2023 11:28:50 AM
+// Creation:   4/24/2023 12:39:30 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,18 +22,12 @@ namespace UnitTestGlaucon
         [TestMethod]
         public void TestC()
         {
-            param.InputFileName = "exC.3dd";
-            var result = ReadFile(param.InputPath + param.InputFileName);
-
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
-
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            Assert.AreEqual(result, 0, $"Error reading {param.InputFileName}");
-
+            var TestObject = new TestCobject();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
-            {
                 Debug.WriteLine(e);
-            }
 
             Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
             // test the force vector
@@ -155,7 +143,7 @@ namespace UnitTestGlaucon
                 0
             });
             //for (int i = 0; i < glaucon.LoadCases.Length; i++)
-            CheckVector(glaucon.LoadCases[0].FMech.Column(0), Fmech, 6, $"{param.InputFileName} FMech ");
+            CheckVector(glaucon.LoadCases[0].MechForces.Column(0), Fmech, 6, $"{param.InputFileName} FMech ");
 
 #if DEBUG
             var Ku = (dbl.DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]

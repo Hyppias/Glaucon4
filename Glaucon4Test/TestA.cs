@@ -2,9 +2,10 @@
 using System.Diagnostics;
 
 using MathNet.Numerics.LinearAlgebra;
-using dbl = MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 using gl = Terwiel.Glaucon;
 using MathNet.Numerics;
+using Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
@@ -13,24 +14,20 @@ namespace UnitTestGlaucon
         [TestMethod]
         public void TestA()
         {
-            param.InputFileName = "exA.3dd";
-            var result = ReadFile(param.InputPath + param.InputFileName);
-            Assert.AreEqual(result, 0, "Error reading input param.InputFileName");
-
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
-            
-
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
+            var TestObject = new TestAobject();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
             Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
-            Assert.AreEqual(glaucon.nN, 12, $"{param.InputFileName} # nodes");
-            Assert.AreEqual(glaucon.nE, 21, $"{param.InputFileName} # members");
-            Assert.AreEqual(glaucon.nR, 12, $"{param.InputFileName} # nodes with Reactions");
-            Assert.AreEqual(glaucon.nL, 2, $"{param.InputFileName} # load cases");
-            Assert.AreEqual(glaucon.nM, 0, $"{param.InputFileName} # dynamic modes");
+            Assert.AreEqual(glaucon.Nodes.Count, 12, $"{param.InputFileName} # nodes");
+            Assert.AreEqual(glaucon.Members.Count, 21, $"{param.InputFileName} # members");
+            Assert.AreEqual(glaucon.NodeRestraints.Count, 12, $"{param.InputFileName} # nodes with Reactions");
+            Assert.AreEqual(glaucon.LoadCases.Count, 2, $"{param.InputFileName} # load cases");
+            Assert.AreEqual(glaucon.AnimatedModes.Length, 0, $"{param.InputFileName} # dynamic modes");
 #if DEBUG
-            var Ku = (dbl.DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
+            var Ku = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
             {
            {  3.271087716609e+003,   8.544203379251e+002,     0 ,                   0 ,                   0 ,                -4.272103374180e-002,  -2.416666666667e+003,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                -8.544210499424e+002,  -8.544203379251e+002,     0 ,                   0 ,                   0 ,                -4.272103374180e-002,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,               },
 {  8.544203379251e+002,   8.544230638312e+002,     0 ,                   0 ,                   0 ,                 1.635543643743e-001,     0 ,                -2.013888843875e-003,     0 ,                   0 ,                   0 ,                 1.208333306325e-001,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                -8.544203379251e+002,  -8.544210499424e+002,     0 ,                   0 ,                   0 ,                 4.272103374180e-002,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,               },
@@ -223,8 +220,8 @@ namespace UnitTestGlaucon
 -               2.53855116319e-02, -3.05086331068e-01,   0.0,   0.0 ,  0.0 ,  2.35400825532e-03  } });
 
 
-            var ReactionSoll = new dbl.DenseMatrix[] {
-                (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(new [,] {
+            var ReactionSoll = new DenseMatrix[] {
+                (DenseMatrix) DenseMatrix.Build.DenseOfArray(new [,] {
                   { 11.940675412, 40.323445902, 0.0 ,0.0, 0.0 , 0.0  ,
                  0.0 , 0.0 , 0.0, 0.0, 0.0 , 0.0,
                  0.0 , 0.0 , 0.0, 0.0, 0.0 , 0.0 ,
@@ -233,7 +230,7 @@ namespace UnitTestGlaucon
                  0.0 , 0.0 , 0.0, 0.0 ,0.0 , 0.0  ,
                  0.0 , 0.0 , 0.0, 0.0 } }),
 
-                (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(new [,] {
+                (DenseMatrix) DenseMatrix.Build.DenseOfArray(new [,] {
                     { -201.50753982, -25.251256636, 0.0 ,0.0 ,0.0 , 0.0 ,
                      0.0 , 0.0 , 0.0, 0.0 ,0.0 , 0.0  ,
                      0.0 , 0.0 , 0.0, 0.0 ,0.0 , 0.0 ,
@@ -246,11 +243,11 @@ namespace UnitTestGlaucon
             foreach (var lc in glaucon.LoadCases)
             {
                 int i = lc.Nr;
-                Assert.AreEqual(lc.nT, k[i, 0], $"{param.InputFileName} # temperature loads load case {i + 1}");
-                Assert.AreEqual(lc.nF, k[i, 1], $"{param.InputFileName} # loaded nodes load case {i + 1}");
-                Assert.AreEqual(lc.nD, k[i, 2], $"{param.InputFileName} # prescribed displacements load case {i + 1}");
+                Assert.AreEqual(lc.TempLoads.Count, k[i, 0], $"{param.InputFileName} # temperature loads load case {i + 1}");
+                Assert.AreEqual(lc.NodalLoads.Count, k[i, 1], $"{param.InputFileName} # loaded nodes load case {i + 1}");
+                Assert.AreEqual(lc.PrescrDisplacements.Count, k[i, 2], $"{param.InputFileName} # prescribed displacements load case {i + 1}");
 
-                CheckVector(glaucon.LoadCases[i].FMech.Column(0), FMechSoll.Column(i), 7, $"{param.InputFileName} FMech lc={i + 1}");
+                CheckVector(glaucon.LoadCases[i].MechForces.Column(0), FMechSoll.Column(i), 7, $"{param.InputFileName} FMech lc={i + 1}");
 
                 //Debug.Assert(lc.Displacements.Column(0).AlmostEqualRelative(sollDispl.Row(i), System.Math.Pow(10,-8)),
                 //    $"{param.InputFileName} Displacements LoadCase {i + 1} "

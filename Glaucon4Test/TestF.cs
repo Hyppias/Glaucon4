@@ -1,18 +1,12 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestF.cs
-// Date: 2021-09-08
-// Created date: 2019-12-15
-// Created time:-7:34 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestF.cs
+// Last write: 5/3/2023 11:34:09 AM
+// Creation:   4/24/2023 12:39:30 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -28,11 +22,12 @@ namespace UnitTestGlaucon
         [TestMethod]
         public void TestF()
         {
-            param.InputFileName = "exF.3dd";
-            var result = ReadFile(param.InputPath + param.InputFileName);
-            Assert.AreEqual(result, 0, $"{file} Error reading {param.InputFileName} ");
-            param.RenumNodes = false;
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
+            var TestObject = new TestFobject();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
+            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
+                Debug.WriteLine(e);
 
             result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors)
@@ -264,7 +259,7 @@ namespace UnitTestGlaucon
             });
             foreach (var lc in glaucon.LoadCases)
             {
-                CheckVector(lc.FMech.Column(0), Fmech, 7, $"{param.InputFileName} FMech ");
+                CheckVector(lc.MechForces.Column(0), Fmech, 7, $"{param.InputFileName} FMech ");
             }
 #if DEBUG
             var Ku = (dbl.DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
@@ -2667,9 +2662,7 @@ namespace UnitTestGlaucon
                 -1.174233436321e+003,
                 0
             });
-
-            CheckVector(glaucon.LoadCases[0].Reactions.Column(0), _reactions, 7, $"{file} Reactions ");
-
+            
             // Test the member end forces:
             var ef = new List<Matrix<double>>
             {

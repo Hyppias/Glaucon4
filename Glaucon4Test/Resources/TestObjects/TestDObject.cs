@@ -9,7 +9,7 @@ namespace UnitTestGlaucon
 {
     public class TestDobject
     {
-        Parameters Param = new Parameters()
+        public Parameters Param = new Parameters()
         {
 
             StrainLimit = 12.0,
@@ -46,7 +46,7 @@ namespace UnitTestGlaucon
             InputSource = 1
         };
 
-        private Glaucon glaucon = new()
+        public Glaucon Glaucon = new()
         {
 
             Title = "Example D: dynamic properties of an un-restrained frame with a triangular section     ",
@@ -115,7 +115,7 @@ namespace UnitTestGlaucon
 
 
                 },
-            AnimatedNodes = new[] { 1, 7, 9, 11, 12, 13 }
+            AnimatedModes = new[] { 1, 7, 9, 11, 12, 13 }
 
 
         };

@@ -1,18 +1,12 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestJ.cs
-// Date: 2021-09-09
-// Created date: 2019-12-15
-// Created time:-7:38 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestJ.cs
+// Last write: 5/3/2023 2:00:25 PM
+// Creation:   4/24/2023 12:39:31 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System;
 using System.Diagnostics;
@@ -27,15 +21,15 @@ namespace UnitTestGlaucon
         [ExpectedException(typeof(InvalidOperationException), "The construction is not restrained.")]
         public void TestJ()
         {
-            // this construction is not restrained and therefor cannot be processed.
-            param.InputFileName = "exJ.3dd";
-            var result = ReadFile(param.InputPath + param.InputFileName);
-            Assert.AreEqual(result, 0, $"Error reading {param.InputFileName}");
-
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
+            var TestObject = new TestJobject();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            
+            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
+                Debug.WriteLine(e);
 
             // won't execute the following, because the expected exception will occur first
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
+            var result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             Assert.AreEqual(result, 0, $"Error executing {param.InputFileName}");
             foreach (var e in gl.Glaucon.Errors)
             {

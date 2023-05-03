@@ -7,7 +7,7 @@ namespace UnitTestGlaucon
 {
     public class TestCobject
     {
-        Parameters Param = new Parameters()
+        public Parameters Param = new Parameters()
         {
 
             StrainLimit = 12.0,
@@ -19,7 +19,6 @@ namespace UnitTestGlaucon
             ResidualTolerance = 1e-6,
             MaxVibrationTime = 12.0,
             Analyze = true,
-            DoModal = true,
             Validate = true,
             ModalExaggeration = 20.0,
             XIncrement = -1,
@@ -43,7 +42,7 @@ namespace UnitTestGlaucon
             Shift = 10.0,
             InputSource = 1
         };
-        private Glaucon glaucon = new()
+        public Glaucon Glaucon = new()
         {
 
             Title = "Example C: a tetrahedral frame - static and dynamic analysis (in, kip) ",
@@ -161,7 +160,7 @@ namespace UnitTestGlaucon
 
 
         }, // End LoadCases
-            AnimatedNodes = new[] { 1, 2, 3, 4, 5 }
+            AnimatedModes = new[] { 1, 2, 3, 4, 5 }
 
 
         };

@@ -7,7 +7,7 @@ namespace UnitTestGlaucon
 {
     public class TestAobject
     {
-         Parameters Param = new Parameters()
+        public Parameters Param = new Parameters()
         {
 
             StrainLimit = 12.0,
@@ -19,13 +19,11 @@ namespace UnitTestGlaucon
             ResidualTolerance = 1e-6,
             MaxVibrationTime = 12.0,
             Analyze = true,
-            DoModal = true,
             Validate = true,
             ModalExaggeration = 20.0,
             XIncrement = -1,
-            UnifLoadsLocal = true,
-            // HTML = 1, Latex = 2, CSV = 3, Excel = 4, XML = 5
-            OutputFormat = 2,
+            UnifLoadsLocal = true,            
+            OutputFormat = 2, // HTML = 1, Latex = 2, CSV = 3, Excel = 4, XML = 5
             RenumNodes = true,
             MaxSegmentCount = 20,
             MinimumIterations = 2,
@@ -43,7 +41,7 @@ namespace UnitTestGlaucon
             Shift = 10.0,
             InputSource = 1
         };
-        private Glaucon glaucon = new()
+        public Glaucon Glaucon = new()
         {
 
             Title = "Example A: linear static analysis of a 2D truss with support settlement (kips,in) ",

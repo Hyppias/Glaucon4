@@ -1,18 +1,12 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestRoll.cs
-// Date: 2021-09-09
-// Created date: 2019-12-15
-// Created time:-7:18 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestRoll.cs
+// Last write: 4/22/2023 4:14:35 PM
+// Creation:   4/24/2023 12:39:31 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System.Diagnostics;
 using System.Reflection;

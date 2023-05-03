@@ -103,8 +103,9 @@ namespace Terwiel.Glaucon
 
             /// <summary>
             /// System stiffness matrix
+            /// public for testing
             /// </summary>
-            private DenseMatrix ku;
+            public DenseMatrix Ku;
 #endif
             public bool Active;
             /// <summary>
@@ -475,8 +476,8 @@ namespace Terwiel.Glaucon
 #if DEBUG
 
                 // keep for testing
-                ku = new DenseMatrix(DoF);
-                SSM.CopyTo(ku);
+                Ku = new DenseMatrix(DoF);
+                SSM.CopyTo(Ku);
 #endif
 
                 // Glaucon.WriteMatrix($"lc_{Nr + 1}_", "Ku.mat", "Ku",  SSM);

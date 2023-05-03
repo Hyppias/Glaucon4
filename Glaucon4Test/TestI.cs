@@ -1,18 +1,12 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestI.cs
-// Date: 2021-09-09
-// Created date: 2019-12-15
-// Created time:-7:37 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestI.cs
+// Last write: 5/3/2023 1:58:06 PM
+// Creation:   4/24/2023 12:39:31 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
@@ -27,24 +21,21 @@ namespace UnitTestGlaucon
         [TestMethod]
         public void Testi()
         {
-            param.InputFileName = "exI.3dd";
-            var result = ReadFile(param.InputPath + param.InputFileName);
-            Assert.AreEqual(result, 0, $"Error reading {file}");
-
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            foreach (var e in gl.Glaucon.Errors)
-            {
+            var TestObject = new TestIobject();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
+            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
-            }
+           
 
-            Assert.AreEqual(24, glaucon.nE, $"{param.InputFileName} Nr of members");
-            Assert.AreEqual(15, glaucon.nN, $"{param.InputFileName} Nr of nodes");
-            Assert.AreEqual(3, glaucon.nR, $"{param.InputFileName} Nr of restrained nodes");
-            Assert.AreEqual(1, glaucon.nL, $"{param.InputFileName} Nr of load cases nL");
-            Assert.AreEqual(1, glaucon.LoadCases[0].nF, $"{param.InputFileName} # loaded nodes");
-            Assert.AreEqual(12, glaucon.LoadCases[0].nU, $"{param.InputFileName} # uniform loads");
-            Assert.AreEqual(4, glaucon.nM, $"{file} # modes");
+            Assert.AreEqual(24, glaucon.Members.Count, $"{param.InputFileName} Nr of members");
+            Assert.AreEqual(15, glaucon.Nodes.Count, $"{param.InputFileName} Nr of nodes");
+            Assert.AreEqual(3, glaucon.NodeRestraints.Count, $"{param.InputFileName} Nr of restrained nodes");
+            Assert.AreEqual(1, glaucon.LoadCases.Count, $"{param.InputFileName} Nr of load cases.LoadCases.Count");
+            Assert.AreEqual(1, glaucon.LoadCases[0].NodalLoads.Count, $"{param.InputFileName} # loaded nodes");
+            Assert.AreEqual(12, glaucon.LoadCases[0].UniformLoads.Count, $"{param.InputFileName} # uniform loads");
+            Assert.AreEqual(4, glaucon.param.DynamicModesCount, $"{param.InputFileName} # modes");
             Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
             // test the force vector
             var Fmech = Vector<double>.Build.DenseOfArray(new[]

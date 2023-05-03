@@ -10,9 +10,9 @@ namespace UnitTestGlaucon
 {
     public class TestEobject
     {
-        Parameters Param = new Parameters()
+        public Parameters Param = new Parameters()
         {
-
+            
             StrainLimit = 12.0,
             EquilibriumTolerance = 12.0,
             EquilibriumError = 12.0,
@@ -21,15 +21,14 @@ namespace UnitTestGlaucon
             ModalConvergenceTol = 1e-5,
             ResidualTolerance = 1e-6,
             MaxVibrationTime = 12.0,
-            Analyze = true,
-            DoModal = true,
+            Analyze = false,
             Validate = true,
             ModalExaggeration = 10.0,
             XIncrement = 6.0,
             UnifLoadsLocal = true,
-            // HTML = 1, Latex = 2, CSV = 3, Excel = 4, XML = 5
-            OutputFormat = 2,
-            RenumNodes = true,
+            
+            OutputFormat = 2,// HTML = 1, Latex = 2, CSV = 3, Excel = 4, XML = 5
+            RenumNodes = false,
             MaxSegmentCount = 20,
             MinimumIterations = 2,
             MaximumIterations = 13,
@@ -48,7 +47,7 @@ namespace UnitTestGlaucon
             InputSource = 1
         };
 
-        private Glaucon glaucon = new()
+        public Glaucon Glaucon = new()
         {
 
             Title = "Example E: a three dimensional structure showing lateral-torsional dynamic modes (units: kip, in)",
@@ -135,12 +134,12 @@ namespace UnitTestGlaucon
             {
                 new (12, new[]{ 3.388,0,0,939,37})
             },
-            AnimatedNodes = new[] { 1, 2,3,4 },
+            AnimatedModes = new[] { 1, 2,3,4 },
             NodesToCondense = new List<CondensedNode>
             {
                 new (12, new[]{1,1,0,0,0,1})
-            }
-            
+            },
+            MatchedCondenseModes = new []{1,2,3 }
 
         };
     };

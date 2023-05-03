@@ -1,24 +1,18 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestCoCa1.cs
-// Date: 2021-09-08
-// Created date: 2019-12-15
-// Created time:-7:39 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestCoCa1.cs
+// Last write: 5/3/2023 2:13:42 PM
+// Creation:   4/24/2023 12:39:30 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System.Collections.Generic;
 using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using dbl = MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
@@ -28,17 +22,12 @@ namespace UnitTestGlaucon
         [TestMethod]
         public void TestCoCa1()
         {
-            param.InputFileName = "CoCatest.3dd";
-            var result = ReadFile(param.InputPath + param.InputFileName);
-
-            Assert.AreEqual(result, 0, $"{file} Error reading {param.InputFileName} ");
-
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
+            var TestObject = new TestCoCa();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
-            {
                 Debug.WriteLine(e);
-            }
 
             Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
             // test the force vector

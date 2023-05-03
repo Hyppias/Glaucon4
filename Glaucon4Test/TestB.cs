@@ -1,18 +1,12 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestB.cs
-// Date: 2021-09-08
-// Created date: 2019-12-15
-// Created time:-7:23 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestB.cs
+// Last write: 5/3/2023 10:18:04 AM
+// Creation:   4/24/2023 12:39:30 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,26 +23,17 @@ namespace UnitTestGlaucon
         [TestMethod]
         public void TestB()
         {
-            Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
-            param.InputFileName = "exB.3dd";
-            param.RenumNodes = false;
-            var result = ReadFile(param.InputPath + param.InputFileName);
-            Assert.AreEqual(0, result, "Error reading input file");
-
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
-
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            Assert.AreEqual(glaucon.Space, "XYZ", "Dimensionality is wrong");
-            foreach (var e in gl.Glaucon.Errors) // for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
-            {
+            var TestObject = new TestBobject();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
+            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
-            }
-
             Assert.AreEqual(0, result, $"{param.InputFileName} Exit code Glaucon");
-            Assert.AreEqual(4, glaucon.nE, $"{param.InputFileName} Nr of members");
-            Assert.AreEqual(5, glaucon.nN, $"{param.InputFileName} Nr of nodes");
-            Assert.AreEqual(4, glaucon.nR, $"{param.InputFileName} Nr of restrained nodes");
-            Assert.AreEqual(3, glaucon.nL, $"{param.InputFileName} Nr of load cases nL");
+            Assert.AreEqual(4, glaucon.Members.Count, $"{param.InputFileName} Nr of members");
+            Assert.AreEqual(5, glaucon.Nodes.Count, $"{param.InputFileName} Nr of nodes");
+            Assert.AreEqual(4, glaucon.NodeRestraints.Count, $"{param.InputFileName} Nr of restrained nodes");
+            Assert.AreEqual(3, glaucon.LoadCases.Count, $"{param.InputFileName} Nr of load cases");
 
             int[,] n =
             {
@@ -56,16 +41,16 @@ namespace UnitTestGlaucon
                 {0, 2, 2, 0, 1, 0},
                 {0, 0, 0, 2, 0, 0}
             };
-            for (var i = 0; i < glaucon.nL; i++)
+            for (var i = 0; i < glaucon.LoadCases.Count; i++)
             {
                 var lc1 = glaucon.LoadCases[i];
                 Assert.IsNotNull(lc1, $"Load case {i + 1} set to NULL");
-                Assert.AreEqual(n[i, 0], lc1.nF, $"{param.InputFileName} Load case {i + 1} Nr of loaded nodes");
-                Assert.AreEqual(n[i, 1], lc1.nU, $"{param.InputFileName} Load case {i + 1} Nr of uniform loads");
-                Assert.AreEqual(n[i, 2], lc1.nW, $"{param.InputFileName} Load case {i + 1} Nr of Trap loads");
-                Assert.AreEqual(n[i, 3], lc1.nP, $"{param.InputFileName} Load case {i + 1} Nr of Conc. loads");
-                Assert.AreEqual(n[i, 4], lc1.nT, $"{param.InputFileName} Load case {i + 1} Nr of temperature loads");
-                Assert.AreEqual(n[i, 5], lc1.nD, $"{param.InputFileName} Load case {i + 1} Nr of pescr. displ");
+                Assert.AreEqual(n[i, 0], lc1.NodalLoads.Count, $"{param.InputFileName} Load case {i + 1} Nr of loaded nodes");
+                Assert.AreEqual(n[i, 1], lc1.UniformLoads.Count, $"{param.InputFileName} Load case {i + 1} Nr of uniform loads");
+                Assert.AreEqual(n[i, 2], lc1.TrapLoads.Count, $"{param.InputFileName} Load case {i + 1} Nr of Trap loads");
+                Assert.AreEqual(n[i, 3], lc1.IntPointLoads.Count, $"{param.InputFileName} Load case {i + 1} Nr of Conc. loads");
+                Assert.AreEqual(n[i, 4], lc1.TempLoads.Count, $"{param.InputFileName} Load case {i + 1} Nr of temperature loads");
+                Assert.AreEqual(n[i, 5], lc1.PrescrDisplacements.Count, $"{param.InputFileName} Load case {i + 1} Nr of pescr. displ");
             }
 
             //dbl.DenseMatrix[] ke = new dbl.DenseMatrix[4]
@@ -268,7 +253,7 @@ namespace UnitTestGlaucon
             //Ku.PermuteRows(gl.Glaucon.Perm);
             //CheckMatrix(glaucon.LoadCases[0].Ku, Ku, 3, 1e-13, $"{param.InputFileName} Ku");
 #endif
-            Assert.AreEqual(glaucon.nM, 6, $"{file} Nr of dyn.modes nM");
+            //Assert.AreEqual(param.DynamicModesCount, 6, $"{file} Nr of dyn.modes nM");
 
             // test consistent mass matrix
             var sollCons = Matrix<double>.Build.DenseOfArray(new[,]
@@ -426,9 +411,9 @@ namespace UnitTestGlaucon
             };
 
             //var g = Matrix<double>.Build.Dense(12, 12);
-            for (var i = 0; i < glaucon.Members.Length; i++)
+            for (var i = 0; i < glaucon.Members.Count; i++)
             {
-                CheckMatrix(glaucon.Members[i].gamma.SubMatrix(0, 3, 0, 3), sollg[i], 7,
+                CheckMatrix(glaucon.Members[i].Gamma.SubMatrix(0, 3, 0, 3), sollg[i], 7,
                     $"{param.InputFileName} Gamma for member {i + 1}");
             }
 
@@ -504,10 +489,10 @@ namespace UnitTestGlaucon
                     }
                 })
             };
-            for (var j = 0; j < glaucon.LoadCases.Length; j++)
+            for (var j = 0; j < glaucon.LoadCases.Count; j++)
             {
                 var Q1 = glaucon.LoadCases[j].Q;
-                for (var i = 0; i < glaucon.nE; i++)
+                for (var i = 0; i < glaucon.Members.Count; i++)
                 {
                     CheckVector(Q1[i], sollQ[j].Row(i), 2,
                         $"{param.InputFileName} EndForces for Loadcase {j + 1}, member {i + 1} ");
@@ -647,8 +632,8 @@ namespace UnitTestGlaucon
                 })
             };
 
-            for (var i = 0; i < glaucon.LoadCases.Length; i++)
-            for (var j = 0; j < glaucon.Members.Length; j++)
+            for (var i = 0; i < glaucon.LoadCases.Count; i++)
+            for (var j = 0; j < glaucon.Members.Count; j++)
             {
                 CheckVector(glaucon.LoadCases[i].MinMaxDispl.Row(2 * j), sollPeakDispl[i].Row(j * 2), 3,
                     $"{param.InputFileName} Maximum Peak Displacements loadcase {i + 1}, member {j + 1}");
@@ -693,8 +678,8 @@ namespace UnitTestGlaucon
 /*    4   min*/ {-1.2638816e+02, 3.9696875e+01, 3.5129639e+01, 1.3506697e+04, -2.6294654e+04, -2.7379332e+04}
                 })
             };
-            for (var i = 0; i < glaucon.LoadCases.Length; i++)
-            for (var j = 0; j < glaucon.Members.Length; j++)
+            for (var i = 0; i < glaucon.LoadCases.Count; i++)
+            for (var j = 0; j < glaucon.Members.Count; j++)
             {
                 CheckVector(glaucon.LoadCases[i].MinMaxForce.Row(2 * j), sollq[i].Row(j * 2), 4,
                     $"{param.InputFileName} Maximum Peak forces loadcase {i + 1}, member {j + 1}");

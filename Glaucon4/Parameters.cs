@@ -81,11 +81,6 @@ namespace Terwiel.Glaucon
         public double MaxEigenvalue ;
 
         /// <summary>
-        /// limit vibration time to look for
-        /// </summary>
-        public double MaxVibrationTime;
-
-        /// <summary>
         /// nr. of frequencies found
         /// </summary>
         public int FrequenciesFound;
@@ -114,9 +109,9 @@ namespace Terwiel.Glaucon
         /// <summary>
         /// Find eigenfrequencies?
         /// </summary>
-        public bool DoModal;
+       
         public string Title;
-        public double ModalExaggeration;
+        
         /// <summary>
         /// which method to use for modal analysis:
         /// 1 = FEAST algorithm:
@@ -124,10 +119,15 @@ namespace Terwiel.Glaucon
         /// 2 (default) = LAPACKE_dsygv:  get ALL eigenvalues and optionally eigenvectors
         /// 3 = LAPACKE_dsygvx: computes selected eigenvalues, and optionally, eigenvectors
         /// </summary>
-        public int ModalMethod ;
-        public int CondensationMethod;
+        
+        public int CondensationMethod; // 1 = static, 2 = Guyan, 3 = Dynamic 
+
         public double DeformationExaggeration;
-        public int DynamicModesCount;
+
+        public int ModalMethod ; // 0 = none, 1 = subspace-Jacobi, 2 = Stodola
+        public int DynamicModesCount; // formerly nM
+        public double ModalExaggeration;
+        
         #endregion
 
         public double ModalConvergenceTol { get; set; }

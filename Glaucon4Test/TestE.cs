@@ -1,20 +1,15 @@
-﻿#region FileHeader
-
-// Solution: Glaucon
-// Project: UnitTestGlaucon2
-// Filename: TestE.cs
-// Date: 2021-09-08
-// Created date: 2019-12-15
-// Created time:-7:33 PM
-// 
-// Copyright: E.H. Terwiel, 2021, the Netherlands
-// 
-// No part of these files may be copied in any form without written consent
-// of the programmer/owner/copyrightholder.
-
-#endregion
+#region FileHeader
+// Project: Glaucon4Test
+// Filename:   TestE.cs
+// Last write: 5/3/2023 11:31:57 AM
+// Creation:   4/24/2023 12:39:30 PM
+// Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
+// No part of this file may be copied in any form without written consent
+// of the programmer, owner and/or copyrightholder.
+#endregion FileHeader
 
 using System;
+using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using dbl = MathNet.Numerics.LinearAlgebra.Double;
@@ -27,11 +22,12 @@ namespace UnitTestGlaucon
         [TestMethod]
         public void TestE()
         {
-            param.InputFileName = "exE.3dd";
-            var result = ReadFile(param.InputPath + param.InputFileName);
-            Assert.AreEqual(result, 0, $"Error reading {param.InputFileName}");
-
-            var glaucon = new gl.Glaucon(ms.GetBuffer(), param);
+           var TestObject = new TestEobject();
+            var param = TestObject.Param;
+            var glaucon = TestObject.Glaucon;
+            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
+            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
+                Debug.WriteLine(e);
             param.Analyze = false;
             result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
 
@@ -548,7 +544,7 @@ namespace UnitTestGlaucon
             });
             foreach (var lc in glaucon.LoadCases)
             {
-                CheckVector(lc.FMech.Column(0), Fmech, 10, $"{param.InputFileName} FMech ");
+                CheckVector(lc.MechForces.Column(0), Fmech, 10, $"{param.InputFileName} FMech ");
             }
 
             var sollEig = dbl.DenseVector.Build.DenseOfArray(new[]

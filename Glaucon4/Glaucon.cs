@@ -64,7 +64,7 @@ namespace Terwiel.Glaucon
                     reactions = LoadCases[0].Reactions;
                     endforces = LoadCases[0].Q;
 
-                    if (Param.DoModal)
+                    if (Param.ModalMethod != None)
                     {
                         // K was set up during load case processing:
                         K.PermuteColumns(Perm.Inverse());
@@ -171,16 +171,20 @@ namespace Terwiel.Glaucon
         /// </summary>
         public int Cdof;
 
+        public double TotalMass;
+        public double StructMass;
+
         /// <summary>
         /// list of DoF's to condense.
         /// </summary>
-        public List<int> DoFToCondense;
+        public int[] DoFToCondense;
 
         public List<ExtraNodeInertia> ExtraNodeInertias;
-
         public List<ExtraElementMass> ExtraElementMasses;
         public List<CondensedNode> CondensedNodes;
-        public int[] AnimatedNodes;
+        public int[] AnimatedModes; // anim[]
+        public int[] MatchedCondenseModes;
+
         #endregion
 
 
@@ -377,8 +381,6 @@ namespace Terwiel.Glaucon
         [XmlArrayItem("NodeToCondense")]
         [Description("list of nodes to condense")]
         public List<CondensedNode> NodesToCondense { get; set; }
-
-        public List<int> MatchedCondenseModes;
 
         public List<NodeRestraint> NodesRestraints;
 
@@ -596,7 +598,7 @@ namespace Terwiel.Glaucon
             Lg($"{LoadCases.Count} load cases.");
 
             // number of desired dynamic modes of vibration = 3
-            if (Param.DoModal && Param.DynamicModesCount > 0)
+            if (Param.DynamicModesCount > 0)
             {
                 foreach (var eni in ExtraNodeInertias)
                 {
@@ -615,10 +617,9 @@ namespace Terwiel.Glaucon
                     structMass += mbr.Mass;
                 }
             }
-            else
-            {
-                Param.DoModal = false;
-            }
+            
+            ReadCondensationData();
+
 
 
 #if DEBUG
@@ -721,7 +722,7 @@ namespace Terwiel.Glaucon
                 }
             }
 
-            if (Param.DoModal)
+            if (Param.ModalMethod != None)
             {
                 nM = buffer.ReadInt32(); // number of desired dynamic modes of vibration
                 if (nM > 0)
@@ -730,7 +731,7 @@ namespace Terwiel.Glaucon
                 }
                 else
                 {
-                    Param.DoModal = false;
+                    Param.ModalMethod = None;
                 }
             }
 
@@ -854,7 +855,7 @@ namespace Terwiel.Glaucon
                         LoadCases[i] = new LoadCase(i, Members);
                     }
 
-                    if (Param.DoModal)
+                    if (Param.ModalMethod != None)
                     {
                         nM = buffer.ReadInt32(); // number of desired dynamic modes of vibration
                         if (nM > 0)
@@ -863,7 +864,7 @@ namespace Terwiel.Glaucon
                         }
                         else
                         {
-                            Param.DoModal = false;
+                            Param.ModalMethod = None;
                         }
                     }
 

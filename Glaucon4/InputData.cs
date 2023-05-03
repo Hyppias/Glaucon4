@@ -16,8 +16,7 @@ namespace Terwiel.Glaucon
             ModalConvergenceTol = 12.0,
             ResidualTolerance = 12.0,
             MaxVibrationTime = 12.0,
-            Analyze = true,
-            DoModal = true,
+            Analyze = true,            
             Validate = true,
             UnifLoadsLocal = true,
             // HTML = 1, Latex = 2, CSV = 3, Excel = 4, XML = 5
@@ -31,7 +30,7 @@ namespace Terwiel.Glaucon
             // LoopCount = 12, // is out put
             //Iterations = 12, // is output
             Decimals = 2,
-            ModalMethod = 0,
+            ModalMethod = 0, // 0 = none
             // 0 = Glaucon object, 1=JSON,2 = FRAME3DD
             InputSource = 1,
             InputPath = $"{ProjectDir}Glaucon4\\Resources\\",

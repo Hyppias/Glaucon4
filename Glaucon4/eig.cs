@@ -267,8 +267,7 @@ namespace Terwiel.Glaucon
         /// V is a  square  matrix of eigen-vectors
         /// H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  1 March 2007
         /// Bathe, Klaus-Juergen, Finite Element Procecures,
-        /// PHI Learning Private Ltd. 2015 (c) 1995,
-        /// page 912
+        /// PHI Learning Private Ltd. 2015 (c) 1995, page 912
         /// </summary>
         /// <param name="K">K is a symmetric real (stiffness) matrixx</param>
         /// <param name="M">M is a symmetric positive definate real (mass) matrix</param>

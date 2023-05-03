@@ -7,7 +7,42 @@ namespace UnitTestGlaucon
 {
     public class TestBobject
     {
-        private Glaucon glaucon = new()
+        public Parameters Param = new Parameters()
+        {
+
+            StrainLimit = 12.0,
+            EquilibriumTolerance = 12.0,
+            EquilibriumError = 12.0,
+            MinEigenvalue = 12.0,
+            MaxEigenvalue = 12.0,
+            ModalConvergenceTol = 1e-6,
+            ResidualTolerance = 1e-6,
+            MaxVibrationTime = 12.0,
+            Analyze = true,
+            Validate = true,
+            ModalExaggeration = 20.0,
+            XIncrement = -1,
+            UnifLoadsLocal = true,
+            // HTML = 1, Latex = 2, CSV = 3, Excel = 4, XML = 5
+            OutputFormat = 2,
+            RenumNodes = true,
+            MaxSegmentCount = 20,
+            MinimumIterations = 2,
+            MaximumIterations = 13,
+            AccountForShear = true,
+            AccountForGeomStability = false,
+            DeformationExaggeration = 20.0,
+            Decimals = 2,
+            ModalMethod = 1,
+            Scale = 1.0,
+            ConsistentMassMatrix = true,
+            LumpedMassMatrix = true,
+            DynamicModesCount = 14,
+            PanRate = 2.0,
+            Shift = 10.0,
+            InputSource = 1
+        };
+        public Glaucon Glaucon = new()
         {
 
             Title = "Example B: a pyramid-shaped frame --- static and dynamic analysis (N,mm,ton)",
@@ -65,9 +100,7 @@ namespace UnitTestGlaucon
                     {
                         new (2, new double[]{ 0, 0.1,0}),
                         new (1, new double[]{ 0, 0,0.1})
-                    },
-
-                   
+                    },                  
 
                 }, // end LoadCase
 
