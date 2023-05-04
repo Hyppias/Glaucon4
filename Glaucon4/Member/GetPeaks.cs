@@ -14,10 +14,10 @@ namespace Terwiel.Glaucon
         /// </summary>
         public partial class Member
         {
-            private DenseVector maxPeakDisplacements = new(6);
-            private DenseVector maxPeakForces = new(6);
-            private DenseVector minPeakDisplacements = new(6);
-            private DenseVector minPeakForces = new(6);
+            public DenseVector maxPeakDisplacements = new(6);
+            public DenseVector maxPeakForces = new(6);
+            public DenseVector minPeakDisplacements = new(6);
+            public DenseVector minPeakForces = new(6);
 
             public void GetMemberPeaks(LoadCase lc, DenseVector displacements)
             {

@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestEVD.cs
-// Last write: 4/22/2023 4:14:35 PM
+// Last write: 5/3/2023 3:38:17 PM
 // Creation:   4/24/2023 12:39:30 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -39,8 +39,8 @@ namespace UnitTestGlaucon
                 {88.5512e+003, 9.1266e+003, 17.9769e+003, 282.6515e+003, 715.2125e+003}
             };
 
-            var C = (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(A).Inverse() *
-                (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(B);
+            var C = (DenseMatrix) DenseMatrix.Build.DenseOfArray(A).Inverse() *
+                (DenseMatrix) DenseMatrix.Build.DenseOfArray(B);
             var E = C.Evd(Symmetricity.Symmetric);
 
             var ev = E.EigenValues;

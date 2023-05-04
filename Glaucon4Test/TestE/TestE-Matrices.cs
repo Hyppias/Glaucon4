@@ -1,45 +1,26 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestE.cs
-// Last write: 5/3/2023 11:31:57 AM
+// Last write: 5/3/2023 3:38:17 PM
 // Creation:   4/24/2023 12:39:30 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
 // of the programmer, owner and/or copyrightholder.
 #endregion FileHeader
 
-using System;
-using System.Diagnostics;
+// using System;
+// using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using dbl = MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    public partial class UnitTestE
     {
-        [TestMethod]
-        public void TestE()
-        {
-           var TestObject = new TestEobject();
-            var param = TestObject.Param;
-            var glaucon = TestObject.Glaucon;
-            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
-                Debug.WriteLine(e);
-            param.Analyze = false;
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-
-            foreach (var e in gl.Glaucon.Errors)
-            {
-                Console.WriteLine(e);
-            }
-
-            Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
-
 #if DEBUG
-            var Ku = (dbl.DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
+            DenseMatrix Ku = (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {
                     1.534801497097e+007, 0, 0, 0, -1.328782715864e+003, -1.538878842676e+006, -1.526249955556e+007, 0,
@@ -462,12 +443,10 @@ namespace UnitTestGlaucon
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.340023088252e+008
                 }
             });
-            Ku.PermuteColumns(gl.Glaucon.Perm);
-            Ku.PermuteRows(gl.Glaucon.Perm);
-            CheckMatrix(glaucon.LoadCases[0].Ku, Ku, 10, $"{param.InputFileName} Ku");
+           
 #endif
             // test the force vector
-            var Fmech = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> Fmech = Vector<double>.Build.DenseOfArray(new[]
             {
                 -8.399884578845e+000,
                 0,
@@ -541,21 +520,10 @@ namespace UnitTestGlaucon
                 0,
                 0,
                 0
-            });
-            foreach (var lc in glaucon.LoadCases)
-            {
-                CheckVector(lc.MechForces.Column(0), Fmech, 10, $"{param.InputFileName} FMech ");
-            }
-
-            var sollEig = dbl.DenseVector.Build.DenseOfArray(new[]
-            {
-                0.601871, 0.622296, 1.601568, 9.650854
-            });
-            CheckVector(gl.Glaucon.eigenFreq.SubVector(0, sollEig.Count), sollEig, 2,
-                $"{param.InputFileName} EigenFrequencies ");
+            });  
 
             // test the resulting Reactions vector:
-            var _reactions = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> _reactions = Vector<double>.Build.DenseOfArray(new[]
             {
                 /*-5.757698112510e+001,  2.162161940679e+001, -2.149099330170e+002, -1.420977035018e+003, -3.305989712365e+003, -1.379288059425e+001, */
                 -61.1779534629805, 2.162161940679e+001, -2.149099330170e+002, -1.420977035018e+003, -3402.04039566527,
@@ -566,11 +534,8 @@ namespace UnitTestGlaucon
                 1.076797366427e+004, -1.379460322617e+001
             });
 
-            CheckVector(glaucon.LoadCases[0].Reactions.Column(0), _reactions, 4,
-                $"{param.InputFileName} Reactions ");
-
             // Test the displacements vector:
-            var soll = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> soll = Vector<double>.Build.DenseOfArray(new[]
             {
                 2.522826546856e+000, -1.425469628293e+000, 8.084386194997e-004, 9.635580879796e-003,
                 8.565651278714e-005, 1.439232654464e-001,
@@ -595,9 +560,13 @@ namespace UnitTestGlaucon
                 5.099478465601e-003, 1.439410823963e-001
             });
 
-            CheckVector(glaucon.LoadCases[0].Displacements.Column(0), soll, 2, $"{param.InputFileName} Displacements ");
+        
+            Vector<double> sollEig = Vector.Build.DenseOfArray(new[]
+            {
+                0.601871, 0.622296, 1.601568, 9.650854
+            });
 
-            var _minmax = dbl.DenseMatrix.Build.DenseOfArray(new[,]
+            Matrix<double> _minmax = Matrix.Build.DenseOfArray(new[,]
             {
 /*  1    max */ {7.6278611e+01, -2.1965484e-01, 1.0989552e+02, -1.5433764e+03, 4.9754517e+03, 5.8441976e+02},
 /*  1    min */ {7.6278611e+01, -2.1965484e-01, 1.0989552e+02, -1.5433764e+03, -2.9365050e+03, -2.2184248e+02},
@@ -631,8 +600,5 @@ namespace UnitTestGlaucon
 /* 15    min */ {1.1769613e+00, -8.9751443e+00, -1.0457324e+02, -1.5378204e+03, -7.3970955e+03, -4.2302931e+02}
             });
 
-            CheckMatrix(glaucon.LoadCases[0].MinMaxForce, _minmax, 2,
-                $"{param.InputFileName} MinMax ");
         }
     }
-}

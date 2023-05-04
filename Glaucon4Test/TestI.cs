@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestI.cs
-// Last write: 5/3/2023 1:58:06 PM
+// Last write: 5/3/2023 3:38:19 PM
 // Creation:   4/24/2023 12:39:31 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -11,7 +11,7 @@
 using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using dbl = MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
@@ -19,7 +19,7 @@ namespace UnitTestGlaucon
     public partial class UnitTestGlaucon2
     {
         [TestMethod]
-        public void Testi()
+        public void TestI()
         {
             var TestObject = new TestIobject();
             var param = TestObject.Param;
@@ -35,7 +35,7 @@ namespace UnitTestGlaucon
             Assert.AreEqual(1, glaucon.LoadCases.Count, $"{param.InputFileName} Nr of load cases.LoadCases.Count");
             Assert.AreEqual(1, glaucon.LoadCases[0].NodalLoads.Count, $"{param.InputFileName} # loaded nodes");
             Assert.AreEqual(12, glaucon.LoadCases[0].UniformLoads.Count, $"{param.InputFileName} # uniform loads");
-            Assert.AreEqual(4, glaucon.param.DynamicModesCount, $"{param.InputFileName} # modes");
+            Assert.AreEqual(4, param.DynamicModesCount, $"{param.InputFileName} # modes");
             Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
             // test the force vector
             var Fmech = Vector<double>.Build.DenseOfArray(new[]
@@ -133,10 +133,10 @@ namespace UnitTestGlaucon
             });
             foreach (var lc in glaucon.LoadCases)
             {
-                CheckVector(lc.FMech.Column(0), Fmech, 4, $"{param.InputFileName} FMech ");
+                CheckVector(lc.MechForces.Column(0), Fmech, 4, $"{param.InputFileName} FMech ");
             }
 #if DEBUG
-            var Ku = (dbl.DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
+            var Ku = (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {
                     2.163652253211e+002, 0, 0, 0, 8.654609012843e+003, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1044,7 +1044,7 @@ namespace UnitTestGlaucon
 
             for (var i = 0; i < ef.RowCount; i++)
             {
-                CheckVector(glaucon.LoadCases[0].Q[i], ef.Row(i), 5, $"{param.InputFileName} Element end forces");
+                CheckVector(glaucon.Members[i].Q, ef.Row(i), 5, $"{param.InputFileName} Element end forces");
             }
         }
     }

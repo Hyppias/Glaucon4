@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestG.cs
-// Last write: 5/3/2023 11:45:10 AM
+// Last write: 5/3/2023 3:38:17 PM
 // Creation:   4/24/2023 12:39:30 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -135,7 +135,7 @@ namespace UnitTestGlaucon
                 CheckVector(lc.MechForces.Column(0), Fmech, 7, $"{param.InputFileName} FMech ");
             }
 #if DEBUG
-            var Ku = (dbl.DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
+            var Ku = (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {
                     6.300377833753e+002, 0, 0, 0, 2.520151133501e+004, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

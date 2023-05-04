@@ -4,22 +4,7 @@
   "properties": {
     "Version": {
       "type": "string"
-    },
-    "Shear": {
-      "type": "boolean"
-    },
-    "Geom": {
-      "type": "boolean"
-    },
-    "Exagg_static": {
-      "type": "number"
-    },
-    "Scale": {
-      "type": "number"
-    },
-    "Dx": {
-      "type": "integer"
-    },
+    },   
     "Nodes": {
       "type": "array",
       "minimum": 2,
@@ -479,25 +464,8 @@
         }
       ]
     },
-    "DynamicModes": {
-      "type": "integer"
-    },
-    "Mmethod": {
-      "type": "integer"
-    },
-    "LumpedMass": {
-      "type": "boolean"
-    },
-    "Tolerance": {
-      "type": "number"
-    },
-    "Shift": {
-      "type": "number"
-    },
-    "Param.DeformationExaggeration": {
-      "type": "integer"
-    },
-    "NodeInertials": {
+   
+    "NodeInertias": {
       "type": "array",
       "minimum": 0,
       "items": [

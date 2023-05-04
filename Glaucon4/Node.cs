@@ -73,7 +73,7 @@ namespace Terwiel.Glaucon
                 Nr = nr;
                 Coord= new DenseVector(coord);
                 NodeRadius = radius;
-                Active = active;
+                Active = true; // nodes may never be made inactive.
             }
 
             public bool Active { get; set; }

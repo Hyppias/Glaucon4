@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestH-a.cs
-// Last write: 5/3/2023 12:53:59 PM
+// Last write: 5/3/2023 3:38:18 PM
 // Creation:   5/3/2023 12:21:45 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -15,9 +15,9 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    public partial class UnitTestH
     {
-        DenseMatrix TestHKu = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
+        DenseMatrix Ku = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
         {
                 {
                     8.901972778637e+002, 0, 0, 0, 2.670591833591e+004, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,

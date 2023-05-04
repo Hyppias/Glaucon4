@@ -40,10 +40,7 @@ namespace Terwiel.Glaucon
         /// <param name="V">V is a  rectangular matrix of eigen-vectors</param>
         /// <param name="ok"></param>
         /// <param name="tol">convergence tolerance</param>
-        public void Subspace(
-            DenseVector omega2, DenseMatrix V,
-            ref int ok, double tol
-        )
+        public void Subspace(DenseVector omega2, DenseMatrix V, ref int ok, double tol)
         {
             //DenseMatrix Kb, Mb, Qb, Xb;
             //Debug.Assert(K.RowCount >= 12);
@@ -412,7 +409,7 @@ namespace Terwiel.Glaucon
         /// <summary>
         /// STODOLA  -  calculate the lowest reqModes eigen-values and eigen-vectors of the
         /// generalized eigen-problem, K v = w M v, using a matrix iteration approach
-        /// with shifting. 								15oct98
+        /// with shifting
         /// H.P. Gavin, Civil Engineering, Duke University, hpgavin@duke.edu  12 Jul 2001
         /// </summary>
         /// <param name="K">stiffness matrix</param>

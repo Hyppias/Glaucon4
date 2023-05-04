@@ -20,7 +20,6 @@ namespace UnitTestGlaucon
             MaxEigenvalue = 12.0,
             ModalConvergenceTol = 1e-5,
             ResidualTolerance = 1e-6,
-            MaxVibrationTime = 12.0,
             Analyze = true,
             Validate = true,
             ModalExaggeration = 0.1,

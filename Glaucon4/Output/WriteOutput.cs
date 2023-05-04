@@ -191,7 +191,7 @@ namespace Terwiel.Glaucon
                                 temp[0] = ndNr + 1;
                                 for (var i = 0; i < 6; i++)
                                 {
-                                    temp[i + 1] = ld.FMech[ndNr * 6 + i, 0];
+                                    temp[i + 1] = ld.MechForces[ndNr * 6 + i, 0];
                                 }
 
                                 TableRow(temp);
@@ -421,18 +421,11 @@ namespace Terwiel.Glaucon
                                 }
 
                                 TableRow(temp);
-                            }
-                            //for (int i = 0; i < ld.Reactions.RowCount; i += 6)
-                            //{
-                            //    int j = 0;
-                            //    temp[j++] = i + 1;
-                            //    for (int k = 0; k < 6; k++)
-                            //        temp[j++] = ld.Reactions[i + k, 0];
-                            //    TableRow(temp);
-                            //}
+                            }                           
                         }
                     );
-                    if (deltaX >= 0 && ld.MinMaxForce != null)
+                    // did we calculate the Peak forces?
+                    if (Param.XIncrement >= 0)
                     {
                         Table(new[]
                             {
@@ -442,19 +435,22 @@ namespace Terwiel.Glaucon
                             }, new[] { 1, 1, 3, 3 }, () =>
                             {
                                 var temp = new object[8];
-                                for (var i = 0; i < ld.MinMaxForce?.RowCount; i += 2)
-                                    for (var j = 0; j < 2; j++)
+                                foreach( var mbr in Members)
+                                {
+                                    temp[0] = mbr.Nr;
+                                    temp[1] = "min" ;
+                                    for (var k = 0; k < 6; k++)
                                     {
-                                        var m = 0;
-                                        temp[m++] = i / 2 + 1;
-                                        temp[m++] = j == 0 ? "max" : "min";
-                                        for (var k = 0; k < 6; k++)
-                                        {
-                                            temp[m++] = ld.MinMaxForce[i + j, k];
-                                        }
-
-                                        TableRow(temp);
+                                        temp[2+k] = mbr.minPeakForces[k];
                                     }
+                                    TableRow(temp);
+                                    temp[1] = "max" ;
+                                    for (var k = 0; k < 6; k++)
+                                    {
+                                        temp[2+k] = mbr.maxPeakForces[k];
+                                    }
+                                    TableRow(temp);
+                                }                               
                             }
                         );
                     }

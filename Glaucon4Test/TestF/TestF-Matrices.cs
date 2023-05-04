@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestF.cs
-// Last write: 5/3/2023 11:34:09 AM
+// Last write: 5/3/2023 3:38:17 PM
 // Creation:   4/24/2023 12:39:30 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -12,33 +12,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using MathNet.Numerics.LinearAlgebra;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using dbl = MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    public partial class UnitTestF : UnitTestBase
     {
-        [TestMethod]
-        public void TestF()
-        {
-            var TestObject = new TestFobject();
-            var param = TestObject.Param;
-            var glaucon = TestObject.Glaucon;
-            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
-                Debug.WriteLine(e);
-
-            result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            foreach (var e in gl.Glaucon.Errors)
-            {
-                Debug.WriteLine(e);
-            }
-
-            Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
-            // test the force vector
-
-            var Fmech = Vector<double>.Build.DenseOfArray(new[]
+       
+            Vector<double> Fmech = Vector<double>.Build.DenseOfArray(new[]
             {
                 0,
                 0,
@@ -257,12 +239,9 @@ namespace UnitTestGlaucon
                 1.003301969802e+005,
                 0
             });
-            foreach (var lc in glaucon.LoadCases)
-            {
-                CheckVector(lc.MechForces.Column(0), Fmech, 7, $"{param.InputFileName} FMech ");
-            }
+           
 #if DEBUG
-            var Ku = (dbl.DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
+            DenseMatrix Ku = (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {
                     4.356613088561e+006, 0, 0, 0, 3.910060454976e+006, -2.231577939815e+008, -2.975437253087e+006, 0, 0,
@@ -2559,12 +2538,10 @@ namespace UnitTestGlaucon
                     0, 0, 7.911783914668e+008, 8.523213000273e+005, 2.031408625688e+006, 0, 0, 0, 4.053719414161e+009
                 }
             });
-            Ku.PermuteColumns(gl.Glaucon.Perm);
-            Ku.PermuteRows(gl.Glaucon.Perm);
-            CheckMatrix(glaucon.LoadCases[0].Ku, Ku, 9, $"{param.InputFileName} Ku");
+          
 #endif
             // Test the displacements vector:
-            var soll = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> soll = Vector<double>.Build.DenseOfArray(new[]
             {
                 0.0, 1.31596304851, 0.0, -1.26531345145e-05, -4.12593117068e-06, 0.0,
                 0.0, 1.31596420386, -1.99841306177e-03, -1.26314745550e-05, -1.21132005006e-06, 0.0,
@@ -2611,9 +2588,9 @@ namespace UnitTestGlaucon
                 1.54899857178e-04, 1.38477381005, -2.01578058914e-01, 6.52655571645e-05, 1.06898592542e-05,
                 4.23387137863e-06
             });
-            //CheckVector(glaucon.LoadCases[0].Displacements.Column(0), soll,6, $"{param.InputFileName} Displacements ");
+            //CheckVector(Glaucon.LoadCases[0].Displacements.Column(0), soll,6, $"{Param.InputFileName} Displacements ");
             // test the resulting Reactions vector:
-            var _reactions = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> _reactions = Vector<double>.Build.DenseOfArray(new[]
             {
                 -4.047620641294e+001,
                 4.344970667613e+004,
@@ -2664,7 +2641,7 @@ namespace UnitTestGlaucon
             });
             
             // Test the member end forces:
-            var ef = new List<Matrix<double>>
+            List<Matrix<double>> ef = new List<Matrix<double>>
             {
                 Matrix<double>.Build.DenseOfArray(new[,]
                 {
@@ -2911,7 +2888,7 @@ namespace UnitTestGlaucon
                 })
             }; // end member end forces
 
-            var peak = dbl.DenseMatrix.Build.DenseOfArray(new[,]
+            Matrix<double> peak = DenseMatrix.Build.DenseOfArray(new double[,]
             {
                 /* 1,max  */
                 {-3.2273728e+04, -2.6219390e+01, -4.0476366e+01, -2.6786095e-01, 3.6145029e+04, 2.9531074e+04},
@@ -3144,12 +3121,8 @@ namespace UnitTestGlaucon
                 {-1.7187460e+03, -2.4290495e+01, 6.5519326e-03, -0.0000000e+00, 1.1742154e+03, -1.9122075e+04}
             });
 
-            for (var i = 0; i < glaucon.LoadCases[0].MinMaxForce.RowCount; i++)
-            {
-                CheckVector(glaucon.LoadCases[0].MinMaxForce.Row(i), peak.Row(i), 2, $"Peak forces member {i}");
-            }
-
-            var mass = Matrix<double>.Build.DenseOfArray(new[,]
+           
+            Matrix<double> mass = Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {1.41933e+08, 9.21876e-02, 1.41933e+08, 1.44772e+03, 8.79030e+03, 1.41933e+08},
                 {1.41933e+08, 1.09497e-01, 1.22823e-01, 1.28696e+04, 1.96012e+02, 1.23731e+04},
@@ -3189,7 +3162,7 @@ namespace UnitTestGlaucon
                 {6.73970e-02, 6.61882e-02, 6.84884e-02, 8.85677e+03, 3.30135e+03, 1.02610e+04}
             });
 
-            var Soll_freqs = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> Soll_freqs = Vector<double>.Build.DenseOfArray(new[]
             {
                 0.308593978609874, // ???? deze wordt niet gerapporteerd door Frame3DD
                 1.7218363158e+00, 2.1628114002e+00, 2.2395634010e+00, 3.3344828189e+00,
@@ -3200,7 +3173,5 @@ namespace UnitTestGlaucon
                 2.2012583431e+01, 2.7190469804e+01
             });
 
-            CheckVector(gl.Glaucon.eigenFreq, Soll_freqs, 7, "Eigenfrequencies");
         }
     }
-}

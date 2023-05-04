@@ -50,31 +50,32 @@ namespace Terwiel.Glaucon
             {
                 // header & node number & element number labels
 
-                script.Write($"# {ProgramName} Analysis Results. ");
-                script.WriteLine($"version {ProgramVersion}");
-                script.WriteLine($"# {Title}");
-                script.WriteLine($"# Date/time: {DateTime.Now}");
-                script.WriteLine("# GNUPlot 5.2 script file");
+                script.Write(
+                    $"# {ProgramName} Analysis Results. " +
+                    $"version {ProgramVersion}" +
+                    $"# {Title}" +
+                    $"# Date/time: {DateTime.Now}" +
+                    "# GNUPlot 5.2 script file" +
 
-                script.WriteLine("set autoscale");
-                script.WriteLine("unset border");
-                script.WriteLine("set pointsize 1.0");
-                script.WriteLine("set xtics; set ytics; set ztics;");
-                script.WriteLine("unset zeroaxis");
-                script.WriteLine("unset key");
-                script.WriteLine("unset label");
+                    "set autoscale" +
+                    "unset border" +
+                    "set pointsize 1.0" +
+                    "set xtics; set ytics; set ztics;" +
+                    "unset zeroaxis" +
+                    "unset key" +
+                    "unset label" +
 
-                script.WriteLine("set size 1,1    # 1:1 2D axis scaling ");
-                script.WriteLine("set view equal xyz # 1:1 3D axis scaling ");
+                    "set size 1,1    # 1:1 2D axis scaling " +
+                    "set view equal xyz # 1:1 3D axis scaling " +
 
-                script.WriteLine("set terminal windows background rgb \"black\"");
-                script.WriteLine($"set linetype 1 lc rgb \"green\" lw {lw} pt 1");
-                script.WriteLine($"set linetype 2 lc rgb \"red\" lw {lw} pt 7");
-                script.WriteLine($"set linetype 3 lc rgb \"yellow\" lw {lw} pt 6 pi-1");
-                script.WriteLine($"set linetype 4 lc rgb \"black\" lw {lw} pt 5 pi-1");
-                //script.WriteLine($"set tc rgb \"white\"");
-
-                script.WriteLine("\n# ===== Node number labels =====");
+                    "set terminal windows background rgb \"black\"" +
+                    $"set linetype 1 lc rgb \"green\" lw {lw} pt 1" +
+                    $"set linetype 2 lc rgb \"red\" lw {lw} pt 7" +
+                    $"set linetype 3 lc rgb \"yellow\" lw {lw} pt 6 pi-1" +
+                    $"set linetype 4 lc rgb \"black\" lw {lw} pt 5 pi-1" +
+                    //script.WriteLine($"set tc rgb \"white\"");
+                    "\n# ===== Node number labels ====="
+                );
                 foreach (var node in Nodes)
                 {
                     var c = node.Coord;
@@ -98,10 +99,10 @@ namespace Terwiel.Glaucon
                     plot = "splot"; // 3D plot command
                     D12 = "1:2:3"; // use all 3 coordinate columns
                     D23 = "2:3:4";
-                    script.WriteLine("set parametric");
-                    script.WriteLine($"set view 60, 70, {Param.Scale:F3}");
-                    script.WriteLine("set view equal xyz # 1:1 3D axis scaling");
-                    script.WriteLine("unset key");
+                    script.WriteLine("set parametric"+
+                    $"set view 60, 70, {Param.Scale:F3}"+
+                    "set view equal xyz # 1:1 3D axis scaling"+
+                    "unset key");
                     for (var k = 0; k < 3; k++)
                     {
                         script.WriteLine($"set {"xyz"[k]}label '{"xyz"[k]}'");
@@ -179,18 +180,18 @@ namespace Terwiel.Glaucon
                 foreach (var mbr in Members)
                 {
                     // write deformed shape data for each element					
-                    if (mbr.IncrPeak > 0.0 && lc.TransvDispl?[mbr.Nr].RowCount > 0)
+                    if (mbr.XIncrementCount > 0.0 && lc.TransvDispl?[mbr.Nr].RowCount > 0)
                     {
                         // write the deformed shape on the basis of the calculated
-                        //inter-node deformations (see Peak)
-                        mbr.ForceBentBeam(defrm, lc.TransvDispl[mbr.Nr], Param.DeformationExaggeration);
+                        // inter-node deformations (see Peak)
+                        mbr.ForceBentBeam(defrm, lc.TransvDispl[mbr.Nr]);
                     }
                     else
                     {
                         // fallback:
                         // no transversal displacements were calculated, so
                         // write the deformed shape on the basis of the member end (node) forces/deformations
-                        mbr.CubicBentBeam(defrm, (DenseVector) lc.Displacements.Column(0), Param.DeformationExaggeration);
+                        mbr.CubicBentBeam(defrm, (DenseVector)lc.Displacements.Column(0), Param.DeformationExaggeration);
                     }
 
                     defrm.WriteLine("\n");

@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestCoCa1.cs
-// Last write: 5/3/2023 2:13:42 PM
+// Last write: 5/3/2023 3:38:17 PM
 // Creation:   4/24/2023 12:39:30 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -33,7 +33,7 @@ namespace UnitTestGlaucon
             // test the force vector
 
 #if DEBUG
-            var Ku = (dbl.DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
+            var Ku = (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {
                     3.162816416667e+004, 0, 0, 0, 9.488449250000e+006, 0, -3.162816416667e+004, 0, 0, 0,

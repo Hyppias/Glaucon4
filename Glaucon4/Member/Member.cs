@@ -80,7 +80,8 @@ namespace Terwiel.Glaucon
             #endregion Properties
 
             #region Fields
-
+            
+            public int XIncrementCount;
             public double
                 axial_strain,
                 Ksy,
@@ -98,7 +99,7 @@ namespace Terwiel.Glaucon
             //public DenseVector Q;
 
             public int[] ind; // member-structure DoF index table. It loses significance after Permutation
-            public double IncrPeak;
+            // public double IncrPeak;
 
             #endregion Fields
 
@@ -124,7 +125,7 @@ namespace Terwiel.Glaucon
                 Mat.G = material[1];
                 Mat.E = material[0];
                 Roll = roll;
-                Active = active;
+                Active = true; // members may never be made inactive.
             }
 
             public bool Active;
@@ -154,14 +155,13 @@ namespace Terwiel.Glaucon
                     ind[i + 6] = n2 + i;
                 }
 
-                //var nA = nodes[NodeA];
-                //var nB = nodes[NodeB];
                 Length = Math.Sqrt(
                     Sq(NodeB.Coord[0] - NodeA.Coord[0]) +
                     Sq(NodeB.Coord[1] - NodeA.Coord[1]) +
                     Sq(NodeB.Coord[2] - NodeA.Coord[2])
                 );
-
+                // for ForceBentBeam() (original: nx)
+                XIncrementCount = (int) Math.Floor(Length / Param.XIncrement); 
                 Le = Length - NodeA.NodeRadius - NodeB.NodeRadius;
                 if (Le < 0)
                 {

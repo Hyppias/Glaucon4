@@ -36,14 +36,15 @@ namespace Terwiel.Glaucon
             }
 
             DoFToCondense = new int[DoF]; // array c in FRAME3DD
-            foreach (var cn in CondensedNodes) // List was already set up
+            foreach (var cn in CondensedNodes) // List was already set up, but DoF number are still index 1
             {
-                if (cn.NodeNr < 0 || cn.NodeNr > Nodes.Count)
+                if (cn.NodeNr < 1 || cn.NodeNr > Nodes.Count)
                 {
                     string message = $"Node number ({cn.NodeNr}) out of range in condensation data.";
 
                     throw new IndexOutOfRangeException(message);
                 }
+                cn.NodeNr--;
                 // set up the Vector of DoFs to condense:
                 for (var j = 0; j < 6; j++)
                 {
@@ -51,7 +52,7 @@ namespace Terwiel.Glaucon
                     {
                         Cdof++;
                         // make a list of DoF's to condense (c[] in FRAME3DD)
-                        DoFToCondense[6 * cn.NodeNr + j] = cn.DoFToCondense[j];
+                        DoFToCondense[6 * cn.NodeNr + j] = cn.DoFToCondense[j] - 1;
                     }
                 }
             }
@@ -87,9 +88,10 @@ namespace Terwiel.Glaucon
             Kc = new DenseMatrix(n);
             var Arr = new DenseMatrix(DoF - n);
             var Arc = new DenseMatrix(DoF - n, n);
-            var r = GenerateListOfDoFToCondense(DoF);
+            var r = GenerateListOfDoFNotToCondense(DoF);
 
             for (var i = 0; i < DoF - n; i++)
+            {
                 for (var j = i; j < DoF - n; j++) /* use only upper triangle of K */
                 {
                     var ri = r[i];
@@ -99,8 +101,9 @@ namespace Terwiel.Glaucon
                         Arr[j, i] = Arr[i, j] = K[ri, rj];
                     }
                 }
-
+            }
             for (var i = 0; i < DoF - n; i++)
+            {
                 for (var j = 0; j < n; j++) /* use only upper triangle of K */
                 {
                     var ri = r[i];
@@ -114,7 +117,7 @@ namespace Terwiel.Glaucon
                         Arc[i, j] = K[cj, ri];
                     }
                 }
-
+            }
             xtinvAy(Arc, Arr, Arc, Kc); // uses symmetry
                                         // Kc = (DenseMatrix) Arc.Transpose().Inverse() * Arr * Arc;
 
@@ -149,7 +152,7 @@ namespace Terwiel.Glaucon
             var Drr = new DenseMatrix(DoF - n);
             var Drc = new DenseMatrix(DoF - n, n);
 
-            var r = GenerateListOfDoFToCondense(DoF);
+            var r = GenerateListOfDoFNotToCondense(DoF);
 
             var T = new DenseMatrix(DoF, n);
 
@@ -272,25 +275,19 @@ namespace Terwiel.Glaucon
         /// </summary>
         /// <param name="max">DoF's in the construction (nr. of rows in the stiffness matrix)</param>
         /// <returns>the list of non-condensed DoF's</returns>
-        private int[] GenerateListOfDoFToCondense(int max)
+        private int[] GenerateListOfDoFNotToCondense(int max)
         {
-            DoFToCondense.Sort();
-            var n = DoFToCondense.Count;
-            DoFToCondense.Add(max);
-            var r = new int[max - n];
-            var k = 0;
-            var i1 = 0;
-            foreach (var c in DoFToCondense)
+            var DoFNotCondensed = new int[DoF];
+            for (int i=0; i < DoF; i++)
+            {                
+                DoFNotCondensed[i] = -1;
+            }
+            for (int i=0; i < DoFToCondense.Length; i++)
             {
-                for (; i1 < c; i1++)
-                {
-                    r[k++] = i1;
-                }
-
-                i1 = c + 1;
+                DoFNotCondensed[DoFToCondense[i] - 1] = 1;
             }
 
-            return r;
+            return  DoFNotCondensed;
         }
     }
 }

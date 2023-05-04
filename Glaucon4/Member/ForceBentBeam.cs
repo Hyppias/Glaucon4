@@ -20,6 +20,7 @@ namespace Terwiel.Glaucon
 
     public partial class Glaucon
     {
+        
         public partial class Member
         {
             /// <summary>
@@ -30,10 +31,10 @@ namespace Terwiel.Glaucon
             /// internal axial force, Shear force, torques, or bending moments.
             /// </summary>
             /// <param name="defrm">THe GNUPlot script to write to</param>
-            /// <param name="transvDispl">Transversal displacements of the nodes</param>
-            /// <param name="exagg">Display exaggeration</param>
-            public void ForceBentBeam(StreamWriter defrm, DenseMatrix transvDispl, double exagg)
+            /// <param name="transvDispl">Transversal displacements of the nodes</param>            
+            public void ForceBentBeam(StreamWriter defrm, DenseMatrix transvDispl)
             {
+                return; // TODO: make this work. Does not know the position of D yet
                 var L = new DenseVector(3);
 
                 // three length projections
@@ -42,19 +43,26 @@ namespace Terwiel.Glaucon
                     L[i] = NodeB.Coord[i] - NodeA.Coord[i];
                 }
 
-                // only pick 10 segments of a member:
-                for (double xi = 0; xi <= 1.01 * Length; xi += 0.10 * Length)
+                int nn = 0;
+                double x = 0.0;
+                // only pick 10 segments of a member, at **possibly** equidistant locations
+                // along the length, and no more!
+                for (double xi = 0; xi <= 1.01 * Length && nn < XIncrementCount; xi += 0.10 * Length)
                 {
-                    var n = (int)Math.Floor(xi / IncrPeak);
+                    // find out which displacement we need:
+                    while (x < xi && nn < XIncrementCount)
+                    {
+                        nn++;
+                    }
+                    // TODO: does not work yet
+                    var D = (DenseVector)transvDispl.Row(nn).SubVector(0, 3); // X, Y and Z
 
-                    var D = (DenseVector)transvDispl.Row(n).SubVector(0, 3); // X, Y and Z
-
-                    /* exaggerated deformed shape in global coordinates */
-                    var d = (DenseMatrix)Gamma.SubMatrix(0, 3, 0, 3).Transpose() * D * exagg;
+                    // exaggerated deformed shape in global coordinates dX,dY, dZ)/
+                    var d = (DenseMatrix)Gamma.SubMatrix(0, 3, 0, 3).Transpose() * D * Param.DeformationExaggeration;
 
                     for (var i = 0; i < 3; i++)
                     {
-                        defrm.Write($"{NodeA.Coord[i] + x[n] / Length * L[i] + d[i]:F3} ");
+                        defrm.Write($"{NodeA.Coord[i] + x / Length * L[i] + d[i]:F3} ");
                     }
 
                     defrm.Write("\n");

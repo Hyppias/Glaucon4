@@ -5,7 +5,8 @@ using static Terwiel.Glaucon.Glaucon.LoadCase;
 
 namespace UnitTestGlaucon
 {
-    public class TestBobject
+    public partial class UnitTestB
+
     {
         public Parameters Param = new Parameters()
         {
@@ -17,7 +18,7 @@ namespace UnitTestGlaucon
             MaxEigenvalue = 12.0,
             ModalConvergenceTol = 1e-6,
             ResidualTolerance = 1e-6,
-            MaxVibrationTime = 12.0,
+           
             Analyze = true,
             Validate = true,
             ModalExaggeration = 20.0,
@@ -115,4 +116,5 @@ namespace UnitTestGlaucon
         };
     };
 }
+
 

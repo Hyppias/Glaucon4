@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestH-b.cs
-// Last write: 5/3/2023 12:51:06 PM
+// Last write: 5/3/2023 3:38:18 PM
 // Creation:   5/3/2023 12:34:23 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -16,12 +16,11 @@ using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    public partial class UnitTestH
     {
         
             // Test the member end forces:
-            DenseMatrix TestHef =
-                Matrix<double>.Build.DenseOfArray(new[,]
+            Matrix<double> ef = Matrix<double>.Build.DenseOfArray(new[,]
                 {
                     {
                         2.385684663610e-001, -6.564585004581e+000, -9.547046676636e-001, -7.517503609083e-003,

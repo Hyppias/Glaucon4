@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestGavin.cs
-// Last write: 4/22/2023 4:14:35 PM
+// Last write: 5/3/2023 3:38:17 PM
 // Creation:   4/24/2023 12:39:30 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent
@@ -13,7 +13,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Terwiel.Glaucon;
-using dbl = MathNet.Numerics.LinearAlgebra.Double;
+using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace UnitTestGlaucon
 {
@@ -43,7 +43,7 @@ namespace UnitTestGlaucon
              
              */
 
-        private readonly dbl.DenseMatrix K = (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(new[,]
+        private readonly DenseMatrix K = (DenseMatrix) DenseMatrix.Build.DenseOfArray(new[,]
         {
             {
                 7.078693386629e+03, -2.273736754432e-13, 7.107218125384e-04, 0, -3.923097193768e+02,
@@ -201,7 +201,7 @@ namespace UnitTestGlaucon
             }
         });
 
-        private dbl.DenseMatrix M = (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(new[,]
+        private DenseMatrix M = (DenseMatrix) DenseMatrix.Build.DenseOfArray(new[,]
         {
             {
                 1.007225284626e-01, 0, 0, 0, -1.067457719198e-01, 0, 7.410044033696e-05, 6.450337283110e-06,
@@ -358,7 +358,7 @@ namespace UnitTestGlaucon
         public void TestGavin()
         {
             Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
-            var m = (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(new[,]
+            var m = (DenseMatrix) DenseMatrix.Build.DenseOfArray(new[,]
             {
                 {
                     814.723686393179e+003, 343.618906959194e+003, 86.1904164218685e+003, 225.615715154339e+003,
@@ -398,7 +398,7 @@ namespace UnitTestGlaucon
 
             var d = new double[ub];
             var x = new double[ub];
-            var soll = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(new[]
+            var soll = (DenseVector) DenseVector.Build.DenseOfArray(new[]
             {
                 220.965626894336e-006,
                 -86.3569056532970e-006,
@@ -414,7 +414,7 @@ namespace UnitTestGlaucon
 
             var glaucon = new Glaucon();
             glaucon.ldl_dcmp(m, ub, d, b, x, true, true, ref pd);
-            var _x = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(x);
+            var _x = (DenseVector) DenseVector.Build.DenseOfArray(x);
             Assert.AreEqual(-pd, 1, "there may be only one negative element on vector d");
             CheckVector(_x, soll, tol, "ldl decomp");
             for (var i = 0; i < ub; i++)
@@ -423,7 +423,7 @@ namespace UnitTestGlaucon
             }
 
             glaucon.ldl_dcmp(m, ub, d, b, x, false, true, ref pd);
-            _x = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(x);
+            _x = (DenseVector) DenseVector.Build.DenseOfArray(x);
             Assert.AreEqual(pd, 0, "there may be no negative elements on vector d");
             CheckVector(_x, soll, tol, "ldl decomp");
             for (var i = 0; i < ub; i++)
@@ -432,9 +432,9 @@ namespace UnitTestGlaucon
             }
 
             glaucon.ldl_dcmp(m, ub, d, b, x, true, false, ref pd);
-            _x = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(x);
+            _x = (DenseVector) DenseVector.Build.DenseOfArray(x);
             Assert.AreEqual(-pd, 1, "there may be only one negative element on vector d");
-            CheckVector(_x, (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(new[] {0d, 0, 0, 0, 0, 0, 0, 0}), tol,
+            CheckVector(_x, (DenseVector) DenseVector.Build.DenseOfArray(new[] {0d, 0, 0, 0, 0, 0, 0, 0}), tol,
                 "ldl decomp");
         }
 
@@ -442,28 +442,28 @@ namespace UnitTestGlaucon
         public void TestLUDecomp()
         {
             Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
-            var Asoll = (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(new[,]
+            var Asoll = (DenseMatrix) DenseMatrix.Build.DenseOfArray(new[,]
             {
                 {1, 0, 0, 0},
                 {1, 1.205872292270e+02, 1.454127985264e+04, 1.753492646845e+06},
                 {0, 8.292752113224e-03, -1.205872292270e+02, -1.454127985264e+04},
                 {0, 8.292752113224e-03, -1, 1.454127985264e+04}
             });
-            var Ain = (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(new[,]
+            var Ain = (DenseMatrix) DenseMatrix.Build.DenseOfArray(new[,]
             {
                 {1, 0, 0, 0},
                 {1, 1.205872292270e+02, 1.454127985264e+04, 1.753492646845e+06},
                 {0, 1, 0, 0},
                 {0, 1, 2.411744584540e+02, 4.362383955793e+04}
             });
-            var aIn = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(new[]
+            var aIn = (DenseVector) DenseVector.Build.DenseOfArray(new[]
             {
                 -2.998618701956e+01,
                 -1.525431655339e+01,
                 1.062562218145e-01,
                 1.177004127662e-01
             });
-            var aSollMatlab = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(new[]
+            var aSollMatlab = (DenseVector) DenseVector.Build.DenseOfArray(new[]
             {
                 -29.9861870195600,
                 106.256221814500e-003,
@@ -509,14 +509,14 @@ namespace UnitTestGlaucon
             var glaucon = new Glaucon();
 
             glaucon.Gaussj(m, ub, b, 1);
-            CheckMatrix((dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(b),
-                (dbl.DenseMatrix) dbl.DenseMatrix.Build.DenseOfArray(soll), 6, "Gauss");
+            CheckMatrix((DenseMatrix) DenseMatrix.Build.DenseOfArray(b),
+                (DenseMatrix) DenseMatrix.Build.DenseOfArray(soll), 6, "Gauss");
         }
 
         //[TestMethod]
         public void TestGavinSubspace()
         {
-            var OmegaSoll = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(new[]
+            var OmegaSoll = (DenseVector) DenseVector.Build.DenseOfArray(new[]
             {
                 13965.044270899896, 14410.342843354207, 15306.311778318714, 39700.431023579571,
                 48801.912580020027, 70467.9494750457, 145932391.74502838, 145932391.88928232,
@@ -525,14 +525,14 @@ namespace UnitTestGlaucon
 
             var glaucon = new Glaucon
             {
-                nM = 2
+                
             };
             Glaucon.DoF = K.RowCount;
             param.ModalMethod = ModalMethod.SUBSPACE;
 
             var ub = K.RowCount;
-            var omega = new dbl.DenseVector(ub);
-            var v = new dbl.DenseMatrix(ub);
+            var omega = new DenseVector(ub);
+            var v = new DenseMatrix(ub);
             var ok = 0;
             var tol = 1e-6;
             glaucon.Subspace(omega, v, ref ok, tol);
@@ -543,18 +543,18 @@ namespace UnitTestGlaucon
         //[TestMethod]
         public void TestGavinStodola()
         {
-            var OmegaSoll = (dbl.DenseVector) dbl.DenseVector.Build.DenseOfArray(new[]
+            var OmegaSoll = (DenseVector) DenseVector.Build.DenseOfArray(new[]
             {
                 13965.065502773705, 14410.332240877848, 15306.301208561314, 48801.912535730138
             });
 
-            var glaucon = new Glaucon {nM = 2};
+            var glaucon = new Glaucon { };
 
-            param.ModalMethod = ModalMethod.STODOLA;
-            var modesBathe = Math.Min(2 * glaucon.nM, glaucon.nM + 8);
+            param.ModalMethod = 2;
+            var modesBathe = Math.Min(2 * glaucon.Members.Count, glaucon.Members.Count + 8);
             var ub = K.RowCount;
-            var omega = new dbl.DenseVector(modesBathe);
-            var v = new dbl.DenseMatrix(ub);
+            var omega = new DenseVector(modesBathe);
+            var v = new DenseMatrix(ub);
             var ok = 0;
             var tol = 1e-8;
 

@@ -20,7 +20,6 @@ namespace UnitTestGlaucon
             MaxEigenvalue = 12.0,
             ModalConvergenceTol = 1e-6,
             ResidualTolerance = 1e-6,
-            //MaxVibrationTime = 12.0,
             Analyze = true,
             Validate = true,
             ModalExaggeration = 7.0,
@@ -49,7 +48,7 @@ namespace UnitTestGlaucon
         public Glaucon Glaucon = new()
         {
 
-            Title = "Example G: a building with a set-back  (in,kip)",
+            Title = "Test template to be filled in with your construction",
 
             Nodes = new List<Node>
             {

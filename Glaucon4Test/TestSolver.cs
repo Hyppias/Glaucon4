@@ -1,7 +1,7 @@
 #region FileHeader
 // Project: Glaucon4Test
 // Filename:   TestSolver.cs
-// Last write: 4/22/2023 4:14:35 PM
+// Last write: 5/3/2023 3:38:19 PM
 // Creation:   4/24/2023 12:39:31 PM
 // Copyright: E.H. Terwiel, 2021,2022, 2023, the Netherlands
 // No part of this file may be copied in any form without written consent

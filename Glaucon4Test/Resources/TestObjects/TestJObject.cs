@@ -32,7 +32,6 @@ namespace UnitTestGlaucon
             MinEigenvalue = 12.0,
             MaxEigenvalue = 12.0,            
             ResidualTolerance = 1e-6,
-            MaxVibrationTime = 12.0,
             Analyze = true,
             Validate = true,
             UnifLoadsLocal = true,

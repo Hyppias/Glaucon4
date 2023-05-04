@@ -24,7 +24,7 @@
   "ModalMethod": 0,
   "CondensationMethod":  0,
   "InputSource":  "JSON",
-  "InputPath": "E:\\Users\\erik\\Documents\\Visual Studio 2022\\Projects\\Glaucon-NET6\\TestGlaucon2\\Resources\\",
-  "OutputPath": "E:\\Users\\erik\\Documents\\Visual Studio 2022\\Projects\\Glaucon-NET6\\TestGlaucon2\\Resources\\Data\\",
+  "InputPath": "E:\\Users\\erik\\Documents\\Visual Studio 2022\\Projects\\Glaucon4\\Glaucon4Test\\Resources\\",
+  "OutputPath": "E:\\Users\\erik\\Documents\\Visual Studio 2022\\Projects\\Glaucon4\\Glaucon4Test\\Resources\\Data\\",
   "InputFileName": "DefaultInput.json"
 }

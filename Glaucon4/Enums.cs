@@ -38,7 +38,7 @@ namespace Terwiel.Glaucon
         const int None = 0;
         const int Static = 1;
         const int Modal = 3;
-        const int Dynamic = 2;
+        const int Dynamic = 2; // PazGuyan
     }
 
 }

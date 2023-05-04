@@ -6,7 +6,7 @@ using static Terwiel.Glaucon.Glaucon.LoadCase;
 
 namespace UnitTestGlaucon
 {
-    public class UnitTestGlaucon2
+    public partial class UnitTestGlaucon2
     {
         public Parameters Param = new Parameters()
         {
@@ -29,8 +29,7 @@ namespace UnitTestGlaucon
             EquilibriumError = 12.0,
             MinEigenvalue = 12.0,
             MaxEigenvalue = 12.0,            
-            ResidualTolerance = 1e-6,
-            MaxVibrationTime = 12.0,
+            ResidualTolerance = 1e-6,           
             Analyze = true,
             Validate = true,
             UnifLoadsLocal = true,

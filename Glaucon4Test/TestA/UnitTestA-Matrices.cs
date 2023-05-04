@@ -1,33 +1,22 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
-
+﻿using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using System.Diagnostics;
 using gl = Terwiel.Glaucon;
-using MathNet.Numerics;
-using Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    public partial class UnitTestA
     {
-        [TestMethod]
-        public void TestA()
-        {
-            var TestObject = new TestAobject();
-            var param = TestObject.Param;
-            var glaucon = TestObject.Glaucon;
-            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
-                Debug.WriteLine(e);
-            Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
-            Assert.AreEqual(glaucon.Nodes.Count, 12, $"{param.InputFileName} # nodes");
-            Assert.AreEqual(glaucon.Members.Count, 21, $"{param.InputFileName} # members");
-            Assert.AreEqual(glaucon.NodeRestraints.Count, 12, $"{param.InputFileName} # nodes with Reactions");
-            Assert.AreEqual(glaucon.LoadCases.Count, 2, $"{param.InputFileName} # load cases");
-            Assert.AreEqual(glaucon.AnimatedModes.Length, 0, $"{param.InputFileName} # dynamic modes");
+       
+        int[,] k = new int[,]
+            {
+                {0,5,1 },
+                {3,3,2 }
+            };
+
 #if DEBUG
-            var Ku = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
+            DenseMatrix Ku = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
             {
            {  3.271087716609e+003,   8.544203379251e+002,     0 ,                   0 ,                   0 ,                -4.272103374180e-002,  -2.416666666667e+003,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                -8.544210499424e+002,  -8.544203379251e+002,     0 ,                   0 ,                   0 ,                -4.272103374180e-002,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,               },
 {  8.544203379251e+002,   8.544230638312e+002,     0 ,                   0 ,                   0 ,                 1.635543643743e-001,     0 ,                -2.013888843875e-003,     0 ,                   0 ,                   0 ,                 1.208333306325e-001,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                -8.544203379251e+002,  -8.544210499424e+002,     0 ,                   0 ,                   0 ,                 4.272103374180e-002,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,               },
@@ -103,20 +92,10 @@ namespace UnitTestGlaucon
 {    0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                -1.208333306325e-001,     0 ,                   0 ,                   0 ,                   0 ,                 4.833333225300e+000,  -4.272103374180e-002,  -4.272103374180e-002,     0 ,                   0 ,                   0 ,                 3.417682699344e+000,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                 1.208333306325e-001,     0 ,                   0 ,                   0 ,                 4.833333225300e+000,   1.635543643743e-001,  -7.811229689070e-002,     0 ,                   0 ,                   0 ,                 2.616869829989e+001},
 
             });
-            Ku.PermuteColumns(gl.Glaucon.Perm);
-            Ku.PermuteRows(gl.Glaucon.Perm);
-            //bool AlmostEqualRelative<T>(this Matrix<T> a, Matrix<T> b, double maximumError)
-
-            Debug.Assert(glaucon.LoadCases[0].Ku.AlmostEqualRelative(Ku, System.Math.Pow(10, -5)));
-
-            // CheckMatrix(glaucon.LoadCases[0].Ku, Ku, 5, $"{param.InputFileName} Ku");
+           
 #endif
-            int[,] k = new int[,]
-            {
-                {0,5,1 },
-                {3,3,2 }
-            };
-            var FMechSoll = Matrix<double>.Build.DenseOfArray(new[,] {
+           
+            Matrix<double> FMechSoll = Matrix<double>.Build.DenseOfArray(new[,] {
 
                     {   0                         , 0                         },
     {   0                         , 0                         },
@@ -192,7 +171,7 @@ namespace UnitTestGlaucon
     {   0                         , 0                         }
 
                         });
-            var sollDispl = Matrix<double>.Build.DenseOfArray(new[,] {
+            Matrix<double> sollDispl = Matrix<double>.Build.DenseOfArray(new[,] {
                 {   0.0            ,      0.0           ,  0.0   ,  0.0 , 0.0 , -1.34547792303e-03  ,
                 1.17445845398e-02 ,-1.63879380555e-01  ,  0.0   ,  0.0 , 0.0 , -1.03667217315e-03  ,
                 3.60367805505e-02 ,-2.84155960720e-01  ,  0.0   ,  0.0 , 0.0 , -5.76588469786e-04  ,
@@ -220,7 +199,7 @@ namespace UnitTestGlaucon
 -               2.53855116319e-02, -3.05086331068e-01,   0.0,   0.0 ,  0.0 ,  2.35400825532e-03  } });
 
 
-            var ReactionSoll = new DenseMatrix[] {
+            DenseMatrix[] ReactionSoll = new DenseMatrix[] {
                 (DenseMatrix) DenseMatrix.Build.DenseOfArray(new [,] {
                   { 11.940675412, 40.323445902, 0.0 ,0.0, 0.0 , 0.0  ,
                  0.0 , 0.0 , 0.0, 0.0, 0.0 , 0.0,
@@ -239,29 +218,6 @@ namespace UnitTestGlaucon
                      0.0 , 0.0 , 0.0, 0.0, 0.0 , 0.0  ,
                      0.0 , 0.0 , 0.0, 0.0} })
             };
-
-            foreach (var lc in glaucon.LoadCases)
-            {
-                int i = lc.Nr;
-                Assert.AreEqual(lc.TempLoads.Count, k[i, 0], $"{param.InputFileName} # temperature loads load case {i + 1}");
-                Assert.AreEqual(lc.NodalLoads.Count, k[i, 1], $"{param.InputFileName} # loaded nodes load case {i + 1}");
-                Assert.AreEqual(lc.PrescrDisplacements.Count, k[i, 2], $"{param.InputFileName} # prescribed displacements load case {i + 1}");
-
-                CheckVector(glaucon.LoadCases[i].MechForces.Column(0), FMechSoll.Column(i), 7, $"{param.InputFileName} FMech lc={i + 1}");
-
-                //Debug.Assert(lc.Displacements.Column(0).AlmostEqualRelative(sollDispl.Row(i), System.Math.Pow(10,-8)),
-                //    $"{param.InputFileName} Displacements LoadCase {i + 1} "
-                //    );
-
-                CheckVector(lc.Displacements.Column(0), sollDispl.Row(i), 8,
-                    $"{param.InputFileName} Displacements LoadCase {i + 1} ");
-
-                //Debug.Assert(lc.Reactions.AlmostEqualRelative(ReactionSoll[i].Transpose(), System.Math.Pow(10,-8)),
-                //    $"{param.InputFileName} Reactions lc={i+1}");
-
-                CheckMatrix(lc.Reactions, ReactionSoll[i].Transpose(), 9, $"{param.InputFileName} Reactions lc={i + 1}");
-
-            }
+          
         }
     }
-}
