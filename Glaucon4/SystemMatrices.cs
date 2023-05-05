@@ -74,7 +74,7 @@ namespace Terwiel.Glaucon
                 // Q = axial force, eg. due to temperature change
                 // Przemieniecki chapter 15, page 384, (15.1)
                 {
-                    mbr.GeometricMemberStiffnessMatrix(-Q[mbr.Nr,0 ]);
+                    mbr.GeometricMemberStiffnessMatrix(-Q[mbr.Nr,0]);
                 }
 
                 mbr.AddLocalToGlobal(K, mbr.k);
@@ -107,7 +107,7 @@ namespace Terwiel.Glaucon
                 mbr.AddLocalToGlobal(M, Param.LumpedMassMatrix ? mbr.LumpedMassMatrix() : mbr.ConsistentMassMatrix());
             }
 
-            foreach (var node in Nodes) //for (int j = 0; j < nN; j++)// add extra node mass
+            foreach (var node in Nodes) // add extra node mass
             {
                 if (node.ExtraNodalMass != null)
                 {

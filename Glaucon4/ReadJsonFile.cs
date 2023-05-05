@@ -58,7 +58,6 @@ namespace Terwiel.Glaucon
                 Culture = new CultureInfo("en-US")
             };
 
-
             return serializer.Deserialize<T>(p.CreateReader());
         }
 

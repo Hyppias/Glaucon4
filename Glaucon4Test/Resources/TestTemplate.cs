@@ -6,7 +6,7 @@ using Windows.UI.ViewManagement;
 using static Terwiel.Glaucon.Glaucon;
 using static Terwiel.Glaucon.Glaucon.LoadCase;
 
-namespace UnitTestGlaucon
+namespace Glaucon4Test.Resources
 {
     public class Template
     {
@@ -26,7 +26,7 @@ namespace UnitTestGlaucon
             DeformationExaggeration = 1.0,
             XIncrement = 12.0,
             UnifLoadsLocal = true,
-            
+
             OutputFormat = 2,// HTML = 1, Latex = 2, CSV = 3, Excel = 4, XML = 5
             RenumNodes = true,
             MaxSegmentCount = 20,

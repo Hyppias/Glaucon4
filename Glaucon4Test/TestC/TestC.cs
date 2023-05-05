@@ -9,41 +9,35 @@
 #endregion FileHeader
 
 using System.Collections.Generic;
-using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
+    [TestFixture]
     public partial class UnitTestC : UnitTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestC()
-        {            
-           
+        {
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
 
             Assert.AreEqual(result, 0, $"Error computing {Param.InputFileName}");
             // test the force vector
-           
+
             //for (int i = 0; i < Glaucon.LoadCases.Length; i++)
             CheckVector(Glaucon.LoadCases[0].MechForces.Column(0), Fmech, 6, $"{Param.InputFileName} FMech ");
-
+#if DEBUG
             Ku.PermuteColumns(gl.Glaucon.Perm);
             Ku.PermuteRows(gl.Glaucon.Perm);
-            //CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 6, $"{Param.InputFileName} Ku");
-
-            
+            CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 6, $"{Param.InputFileName} Ku");
+#endif
             CheckVector(Glaucon.LoadCases[0].Displacements.Column(0), soll, 3, $"{Param.InputFileName} Displacements ");
 
             // test the resulting Reactions vector:           
 
             CheckVector(Glaucon.LoadCases[0].Reactions.Column(0), reactionsSoll, 3,
-                $"{Param.InputFileName} Reactions ");  
+                $"{Param.InputFileName} Reactions ");
 
             CheckVector(gl.Glaucon.eigenFreq, Soll_freqs, 4, $"{Param.InputFileName} Eigenfrequencies");
         }

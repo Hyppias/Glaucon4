@@ -8,7 +8,7 @@ using static Terwiel.Glaucon.Glaucon.LoadCase;
 
 namespace UnitTestGlaucon
 {
-    public class TestGobject
+    public partial class UnitTestG
     {
         public Parameters Param = new Parameters()
         {

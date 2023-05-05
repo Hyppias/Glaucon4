@@ -10,16 +10,12 @@
 
 using System.Diagnostics;
 using System.Reflection;
-//using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
     public partial class UnitTestH : UnitTestBase 
         {
-        [TestMethod]
+        [Test]
         public void TestH()
         {
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
@@ -41,14 +37,14 @@ namespace UnitTestGlaucon
                 CheckVector(lc.MechForces.Column(0), Fmech, 6, $"{Param.InputFileName} FMech ");
             }
 #if DEBUG
-            
-            Ku.PermuteColumns(gl.Glaucon.Perm);
-            Ku.PermuteRows(gl.Glaucon.Perm);
-            CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 5, $"{Param.InputFileName} Ku");
+            // no Ku known!
+            //Ku.PermuteColumns(gl.Glaucon.Perm);
+            //Ku.PermuteRows(gl.Glaucon.Perm);
+            //CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 5, $"{Param.InputFileName} Ku");
 #endif
             for (var i = 0; i < ef.RowCount; i++)
             {
-                CheckVector(Glaucon.Members[i].Q, ef.Row(i), 5, $"{Param.InputFileName} Element end forces ");
+                CheckVector(Glaucon.LoadCases[0].Q.Row(i), ef.Row(i), 5, $"{Param.InputFileName} Element end forces ");
             }
 
             // Eigenfrequencies

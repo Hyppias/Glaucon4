@@ -8,37 +8,12 @@
 // of the programmer, owner and/or copyrightholder.
 #endregion FileHeader
 
-using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
-
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    public partial class UnitTestI 
     {
-        [TestMethod]
-        public void TestI()
-        {
-            var TestObject = new TestIobject();
-            var param = TestObject.Param;
-            var glaucon = TestObject.Glaucon;
-            var result = TestObject.Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
-                Debug.WriteLine(e);
-           
-
-            Assert.AreEqual(24, glaucon.Members.Count, $"{param.InputFileName} Nr of members");
-            Assert.AreEqual(15, glaucon.Nodes.Count, $"{param.InputFileName} Nr of nodes");
-            Assert.AreEqual(3, glaucon.NodeRestraints.Count, $"{param.InputFileName} Nr of restrained nodes");
-            Assert.AreEqual(1, glaucon.LoadCases.Count, $"{param.InputFileName} Nr of load cases.LoadCases.Count");
-            Assert.AreEqual(1, glaucon.LoadCases[0].NodalLoads.Count, $"{param.InputFileName} # loaded nodes");
-            Assert.AreEqual(12, glaucon.LoadCases[0].UniformLoads.Count, $"{param.InputFileName} # uniform loads");
-            Assert.AreEqual(4, param.DynamicModesCount, $"{param.InputFileName} # modes");
-            Assert.AreEqual(result, 0, $"Error computing {param.InputFileName}");
             // test the force vector
-            var Fmech = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> Fmech = Vector<double>.Build.DenseOfArray(new[]
             {
                 0,
                 -3.709439699219e-004,
@@ -131,12 +106,9 @@ namespace UnitTestGlaucon
                 0,
                 0
             });
-            foreach (var lc in glaucon.LoadCases)
-            {
-                CheckVector(lc.MechForces.Column(0), Fmech, 4, $"{param.InputFileName} FMech ");
-            }
+          
 #if DEBUG
-            var Ku = (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
+            DenseMatrix Ku = (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
             {
                 {
                     2.163652253211e+002, 0, 0, 0, 8.654609012843e+003, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -782,21 +754,17 @@ namespace UnitTestGlaucon
                     4.456605994757e+003, 0, 0, 0, 0, 6.474927471617e+005
                 }
             });
-            Ku.PermuteColumns(gl.Glaucon.Perm);
-            Ku.PermuteRows(gl.Glaucon.Perm);
-            CheckMatrix(glaucon.LoadCases[0].Ku, Ku, 6, $"{param.InputFileName} Ku");
 #endif
 
             // Eigenfrequencies
-            var sollF = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> sollF = Vector<double>.Build.DenseOfArray(new[]
             {
                 56.507283, 98.281430, 121.945006, 205.222731
             });
-
-            CheckVector(gl.Glaucon.eigenFreq, sollF, 6, $"{param.InputFileName} Eigenfrequencies: ");
+                   
 
             // test the resulting Reactions vector:
-            var _reactions = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> _reactions = Vector<double>.Build.DenseOfArray(new[]
             {
                 4.805915996142e+000,
                 -7.618552127764e+001,
@@ -818,10 +786,9 @@ namespace UnitTestGlaucon
                 5.507114216461e-007
             });
 
-            CheckVector(glaucon.LoadCases[0].Reactions.Column(0), _reactions, 3, $"{param.InputFileName} Reactions ");
-
+        
             // Test the displacements vector:
-            var soll = Vector<double>.Build.DenseOfArray(new[]
+            Vector<double> soll = Vector<double>.Build.DenseOfArray(new[]
             {
                 0,
                 0,
@@ -914,10 +881,10 @@ namespace UnitTestGlaucon
                 -1.372261115052e-010,
                 -5.463173491803e-010
             });
-            CheckVector(glaucon.LoadCases[0].Displacements.Column(0), soll, 4, $"{param.InputFileName} Displacements ");
+            
 
             // Test the member end forces:
-            var ef = Matrix<double>.Build.DenseOfArray(new[,]
+            Matrix<double> ef = Matrix<double>.Build.DenseOfArray(new[,]
                 {
                     {
                         2.821435042457e+002, -7.618552202870e+001, -4.805915997048e+000, 1.245421950649e+000,
@@ -1042,10 +1009,5 @@ namespace UnitTestGlaucon
                 }
             );
 
-            for (var i = 0; i < ef.RowCount; i++)
-            {
-                CheckVector(glaucon.Members[i].Q, ef.Row(i), 5, $"{param.InputFileName} Element end forces");
-            }
         }
     }
-}

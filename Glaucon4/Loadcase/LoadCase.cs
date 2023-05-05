@@ -43,7 +43,7 @@ namespace Terwiel.Glaucon
             /// <summary>
             /// thermal load vectors, all load cases.
             /// </summary>
-            private DenseMatrix fTemp;
+            private DenseMatrix TempForces;
 
             /// <summary>
             /// gravity acceleration in 3 directions
@@ -180,7 +180,7 @@ namespace Terwiel.Glaucon
                 // mechanical component of general force vector
                 // These are the NodeLoads:
                 MechForces = new DenseMatrix(DoF, 1);
-                fTemp = new DenseMatrix(DoF, 1); // thermal component of general temerature load vector
+                TempForces = new DenseMatrix(DoF, 1); // thermal component of general temerature load vector
 
                 F = new DenseMatrix(DoF, 1); // external load vector
 
@@ -366,11 +366,11 @@ namespace Terwiel.Glaucon
                     }
                     for (var i = 0; i < 6; i++)
                     {
-                        fTemp[n1 + i, 0] += eqFTemp[n][i];
+                        TempForces[n1 + i, 0] += eqFTemp[n][i];
                     }
                     for (var i = 6; i < 12; i++)
                     {
-                        fTemp[n2 + i - 6, 0] += eqFTemp[n][i];
+                        TempForces[n2 + i - 6, 0] += eqFTemp[n][i];
                     }
                 }
 
@@ -416,7 +416,7 @@ namespace Terwiel.Glaucon
 
             private DenseMatrix F_mech2 => (DenseMatrix)MechForces.SubMatrix(matrixPart, DoF - matrixPart, 0, 1);
 
-            private DenseMatrix F_temp1 => (DenseMatrix)fTemp.SubMatrix(0, matrixPart, 0, 1);
+            private DenseMatrix F_temp1 => (DenseMatrix)TempForces.SubMatrix(0, matrixPart, 0, 1);
 
             private DenseMatrix Ff => (DenseMatrix)F.SubMatrix(0, matrixPart, 0, 1);
 
@@ -482,7 +482,7 @@ namespace Terwiel.Glaucon
 
                 // Glaucon.WriteMatrix($"lc_{Nr + 1}_", "Ku.mat", "Ku",  SSM);
                 MechForces.PermuteRows(perm);
-                fTemp.PermuteRows(perm);
+                TempForces.PermuteRows(perm);
 
                 // Displacements.PermuteRows(Glaucon.perm);
                 // First apply temperature "forces".
@@ -548,8 +548,8 @@ namespace Terwiel.Glaucon
                 }
 
                 // combine temperature loads and mechanical loads:
-                // {F} = {fTemp} + {mechForces} 
-                F = fTemp + MechForces; // permuted force vector
+                // {F} = {TempForces} + {mechForces} 
+                F = TempForces + MechForces; // permuted force vector
 
                 // Find member end forces {Q} for combined displacements due to 
                 // mechanical plus temperature loads displacements {D}	

@@ -1,17 +1,11 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Diagnostics;
-
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
-using MathNet.Numerics;
+﻿using MathNet.Numerics;
 using Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
     public partial class UnitTestA : UnitTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestA()
         {           
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
@@ -24,14 +18,15 @@ namespace UnitTestGlaucon
             Assert.AreEqual(Glaucon.LoadCases.Count, 2, $"{Param.InputFileName} # load cases");
             Assert.AreEqual(Glaucon.AnimatedModes.Length, 0, $"{Param.InputFileName} # dynamic modes");
 
+            #if DEBUG
             Ku.PermuteColumns(gl.Glaucon.Perm);
             Ku.PermuteRows(gl.Glaucon.Perm);
             //bool AlmostEqualRelative<T>(this Matrix<T> a, Matrix<T> b, double maximumError)
 
             Debug.Assert(Glaucon.LoadCases[0].Ku.AlmostEqualRelative(Ku, System.Math.Pow(10, -5)));
-
+     
             // CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 5, $"{Param.InputFileName} Ku");
-            
+            #endif
             foreach (var lc in Glaucon.LoadCases)
             {
                 int i = lc.Nr;

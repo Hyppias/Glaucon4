@@ -9,11 +9,6 @@
 #endregion FileHeader
 
 using System.Collections.Generic;
-using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {

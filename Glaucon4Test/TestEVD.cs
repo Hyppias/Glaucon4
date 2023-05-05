@@ -17,7 +17,7 @@ namespace UnitTestGlaucon
 {
     public partial class UnitTestGlaucon2
     {
-        [TestMethod]
+        [Test]
         public void TestEVD()
         {
             Console.WriteLine("EVD");

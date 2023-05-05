@@ -5,9 +5,9 @@ using Terwiel.Glaucon;
 using Windows.UI.ViewManagement;
 using static Terwiel.Glaucon.Glaucon;
 
-namespace UnitTestGlaucon
+namespace Glaucon4Test.TestD
 {
-    public class TestDobject
+    public class UnitTestD
     {
         public Parameters Param = new Parameters()
         {

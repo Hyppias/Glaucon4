@@ -8,13 +8,6 @@
 // of the programmer, owner and/or copyrightholder.
 #endregion FileHeader
 
-// using System;
-// using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
-
 namespace UnitTestGlaucon
 {
     public partial class UnitTestE
@@ -565,8 +558,8 @@ namespace UnitTestGlaucon
             {
                 0.601871, 0.622296, 1.601568, 9.650854
             });
-
-            Matrix<double> _minmax = Matrix.Build.DenseOfArray(new[,]
+        // these are for loadCase 0:
+            Matrix<double> MinMax =  (DenseMatrix) Matrix<double>.Build.DenseOfArray(new[,]
             {
 /*  1    max */ {7.6278611e+01, -2.1965484e-01, 1.0989552e+02, -1.5433764e+03, 4.9754517e+03, 5.8441976e+02},
 /*  1    min */ {7.6278611e+01, -2.1965484e-01, 1.0989552e+02, -1.5433764e+03, -2.9365050e+03, -2.2184248e+02},

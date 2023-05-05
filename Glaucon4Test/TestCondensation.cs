@@ -18,7 +18,7 @@ namespace UnitTestGlaucon
 {
     public partial class UnitTestGlaucon2
     {
-        [TestMethod]
+        [Test]
         public void TestGavinModalCond()
         {
             var TestObject = new TestEobject();
@@ -39,7 +39,7 @@ namespace UnitTestGlaucon
             // CheckMatrix(Glaucon.Mc, McSoll, 7, "Condensed mass matrix (Modal).");
         }
 
-        [TestMethod]
+        [Test]
         public void TestGavinStaticCond()
         {
             var TestObject = new TestEobject();
@@ -61,7 +61,7 @@ namespace UnitTestGlaucon
             CheckMatrix(glaucon.Kc, KcSoll, 3, "Condensed stiffness matrix. (Static) ");
         }
 
-        [TestMethod]
+        [Test]
         public void TestGavinPazCond()
         {
            var TestObject = new TestEobject();

@@ -1,9 +1,4 @@
-﻿using MathNet.Numerics;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-using System.Diagnostics;
-using gl = Terwiel.Glaucon;
-
+﻿
 namespace UnitTestGlaucon
 {
     public partial class UnitTestA
@@ -92,7 +87,6 @@ namespace UnitTestGlaucon
 {    0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                -1.208333306325e-001,     0 ,                   0 ,                   0 ,                   0 ,                 4.833333225300e+000,  -4.272103374180e-002,  -4.272103374180e-002,     0 ,                   0 ,                   0 ,                 3.417682699344e+000,     0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                   0 ,                 1.208333306325e-001,     0 ,                   0 ,                   0 ,                 4.833333225300e+000,   1.635543643743e-001,  -7.811229689070e-002,     0 ,                   0 ,                   0 ,                 2.616869829989e+001},
 
             });
-           
 #endif
            
             Matrix<double> FMechSoll = Matrix<double>.Build.DenseOfArray(new[,] {

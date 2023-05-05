@@ -1,25 +1,27 @@
-
-
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using MathNet.Numerics.LinearAlgebra.Double;
+using NUnit.Framework;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
-    
-    public class UnitTestBase
-        {
-        public const string pathName = @"E:\Users\erik\Documents\Visual Studio 2022\Projects\Glaucon4\Glaucon4Test\Resources\";
-        public static BinaryWriter bw;
-        public static DenseMatrix deflection, Reactions;
-        public static DenseMatrix EndForces;
 
-        // Use ClassInitialize to run code before running the first test in the class
-        [ClassInitialize()]
+    public class UnitTestBase
+    {
+        public const string pathName = @"E:\Users\erik\Documents\Visual Studio 2022\Projects\Glaucon4\Glaucon4Test\Resources\";
+
+        public DenseMatrix deflection, Reactions, EndForces;
+
+        public UnitTestBase()
+        {
+            
+        }
+
+        // Use SetUp to run code before running the first test in the class
+        [SetUp]
         public static void MyClassInitialize(TestContext testContext)
         {
             Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
@@ -50,7 +52,7 @@ namespace UnitTestGlaucon
             @"E:\Users\erik\Documents\Visual Studio 2023\Projects\Glaucon4\Glaucon4\bin\Debug\net6.0-windows10.0.22621.0\MKL"
             ;
 
-        [TestInitialize]
+        [SetUp]
         public void MyTestInitialize()
         {
 
@@ -64,10 +66,10 @@ namespace UnitTestGlaucon
         // [ClassCleanup()],
         public static void MyClassCleanup()
         {
-            bw.Close();
+
         }
 
-        [TestCleanup]
+        [TearDown]
         public void CleanupTest()
         {
             gl.Glaucon.K = null;

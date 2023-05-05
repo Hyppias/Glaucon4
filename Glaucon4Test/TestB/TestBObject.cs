@@ -85,11 +85,11 @@ namespace UnitTestGlaucon
                     {
                         new(1, new[] { 100, -200, -100, 0.0, 0.0, 0.0 })
                     },
-                    UniformLoads = new List<UniformLoad>
-                    {
-                        new(1,new double[]{1,1,1}),
-                        new(2,new double[]{1,1,1})
-                    }
+                    //UniformLoads = new List<UniformLoad>
+                    //{
+                    //    new(1,new double[]{1,1,1}),
+                    //    new(2,new double[]{1,1,1})
+                    //}
                 }, // end LoadCase
                 new LoadCase()
                 {
@@ -101,7 +101,27 @@ namespace UnitTestGlaucon
                     {
                         new (2, new double[]{ 0, 0.1,0}),
                         new (1, new double[]{ 0, 0,0.1})
-                    },                  
+                    },
+                     TrapLoads = new List<TrapLoad>
+                        {
+                           new(3 ,new TrapLoad.Load[]
+                                {
+                                    new ((20,   80,  0.01  ,  0.05  )),
+                                    new ((0,   0,  0  ,  0  )),
+                                    new ((80, 830, -0.05, 0.07)),
+                                }),
+                            new(4 ,new TrapLoad.Load[]
+                                {
+                                new ((0,   0,  0  ,  0  )),
+                                new ((68,  130,  0.05  ,  0  )),
+                                new ((80, 830, -0.05, 0.07)),
+                            }),
+                           
+                        },
+                     TempLoads = new List<TempLoad>
+                     {
+                         new (1, new[]{12e-6,10,10,20,10,10,-10})
+                     }
 
                 }, // end LoadCase
 

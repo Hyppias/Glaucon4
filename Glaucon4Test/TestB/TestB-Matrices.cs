@@ -8,25 +8,21 @@
 // of the programmer, owner and/or copyrightholder.
 #endregion FileHeader
 
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-using System.Diagnostics;
 using System.Reflection;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
     public partial class UnitTestB
-    {      
-         int[,] n =
-            {
+    {
+        int[,] n =
+           {
                 {1, 0, 0, 0, 0, 0},
                 {0, 2, 2, 0, 1, 0},
                 {0, 0, 0, 2, 0, 0}
             };
 #if DEBUG
-            DenseMatrix Ku = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
-            {
+        DenseMatrix Ku = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
+        {
                 {
                     7.078764713797e+03, 0, 0, 0, -4.029784492634e+02, 0, -1.769691178449e+03, -1.327117266918e+03,
                     -1.474574741020e+03, 0, -1.007446123159e+02, 9.067015108427e+01, -1.769691178449e+03,
@@ -197,11 +193,9 @@ namespace UnitTestGlaucon
                 }
             });
 #endif
-          
-        
-            // test displacements
-            Matrix<double> soll5 = Matrix<double>.Build.DenseOfArray(new[,]
-            {
+        // test displacements
+        Matrix<double> soll5 = Matrix<double>.Build.DenseOfArray(new[,]
+        {
                 {
                     1.41272729441e-02, -5.02285483302e-02, -2.23737558835e-02, 3.74497547644e-05, 8.66599988108e-06,
                     7.77362632452e-08
@@ -216,8 +210,8 @@ namespace UnitTestGlaucon
                 }
             });
 
-             Matrix<double> sollCons = Matrix<double>.Build.DenseOfArray(new[,]
-            {
+        Matrix<double> sollCons = Matrix<double>.Build.DenseOfArray(new[,]
+       {
                 {
                     1.806317431251e-4, -6.450337283110e-6, -7.167041425678e-6, 0, 2.668644297994e-2, -2.401779868195e-2,
                     7.410044033696e-5, 6.450337283110e-6, 7.167041425678e-6, 0, -1.576892093041e-2, 1.419202883736e-2
@@ -267,9 +261,9 @@ namespace UnitTestGlaucon
                     2.401779868195e-2, -3.202373157593e-2, 0, -5.821050927215e+0, -4.365788195411, 1.091918775130e+1
                 }
             });
-            // Test lumped mass matrix:
-            DenseMatrix sollLump = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
-            {
+        // Test lumped mass matrix:
+        DenseMatrix sollLump = (DenseMatrix)Matrix<double>.Build.DenseOfArray(new[,]
+        {
                 {2.547321834621e-4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 2.547321834621e-4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 0, 2.547321834621e-4, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -284,53 +278,53 @@ namespace UnitTestGlaucon
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 1.327220079543e-3, 9.954150596575e-4, 4.587356513823e-3}
             });
 
-            //DenseVector soll2 = new DenseVector(12) {
-            //      7.549350896813e+1,
-            //     -7.976874190371e+1,
-            //      6.983516554106e+2,
-            //      4.330853281477e+3,
-            //     -2.598929963733e+5,
-            //     -3.037474009183e+4,
-            //     -7.272224024199e+1,
-            //     -2.023125809629e+1,
-            //      2.058052476786e+2,
-            //     -4.330853281477e+3,
-            //      8.716568392654e+4,
-            //      6.847963270740e+3};
-            //var d2 = new DenseVector(12)
-            //{
-            // 0.0000000e+0  ,
-            // 0.0000000e+0  ,
-            // 0.0000000e+0  ,
-            // 0.0000000e+0  ,
-            // 0.0000000e+0  ,
-            // 0.0000000e+0  ,
-            // 2.4925667e-4  ,
-            // -1.3373733e-2 ,
-            // -2.1714220e-2 ,
-            // 4.8695938e-2  ,
-            // -1.7158685e-1 ,
-            // -8.1500946e-2
-            //};
-            //var equivForces = new DenseVector(12){
-            // 2.51622e+2,
-            // 2.81392e+2,
-            // -5.57698e+2,
-            // -1.56439e+5,
-            // 1.83896e+5,
-            // 2.22209e+4,
-            // 8.77621e+1,
-            // 9.81456e+1,
-            // -1.96144e+2,
-            // 7.82404e+4,
-            // -9.20019e+4,
-            // -1.10867e+4
-            //};
+        //DenseVector soll2 = new DenseVector(12) {
+        //      7.549350896813e+1,
+        //     -7.976874190371e+1,
+        //      6.983516554106e+2,
+        //      4.330853281477e+3,
+        //     -2.598929963733e+5,
+        //     -3.037474009183e+4,
+        //     -7.272224024199e+1,
+        //     -2.023125809629e+1,
+        //      2.058052476786e+2,
+        //     -4.330853281477e+3,
+        //      8.716568392654e+4,
+        //      6.847963270740e+3};
+        //var d2 = new DenseVector(12)
+        //{
+        // 0.0000000e+0  ,
+        // 0.0000000e+0  ,
+        // 0.0000000e+0  ,
+        // 0.0000000e+0  ,
+        // 0.0000000e+0  ,
+        // 0.0000000e+0  ,
+        // 2.4925667e-4  ,
+        // -1.3373733e-2 ,
+        // -2.1714220e-2 ,
+        // 4.8695938e-2  ,
+        // -1.7158685e-1 ,
+        // -8.1500946e-2
+        //};
+        //var equivForces = new DenseVector(12){
+        // 2.51622e+2,
+        // 2.81392e+2,
+        // -5.57698e+2,
+        // -1.56439e+5,
+        // 1.83896e+5,
+        // 2.22209e+4,
+        // 8.77621e+1,
+        // 9.81456e+1,
+        // -1.96144e+2,
+        // 7.82404e+4,
+        // -9.20019e+4,
+        // -1.10867e+4
+        //};
 
-            //var Q = mb.MemberForces((DenseVector)deflection.Column(0), equivForces);
+        //var Q = mb.MemberForces((DenseVector)deflection.Column(0), equivForces);
 
-            // test gamma
-            List<Matrix<double>> sollg = new List<Matrix<double>>(4)
+        // test gamma
+        List<Matrix<double>> sollg = new List<Matrix<double>>(4)
             {
                 Matrix<double>.Build.DenseOfArray(new[,]
                 {
@@ -358,7 +352,8 @@ namespace UnitTestGlaucon
                 })
             };
 
-            List<Matrix<double>> sollQ = new List<Matrix<double>>
+        // end forces
+        List<Matrix<double>> sollEndForces = new List<Matrix<double>>
             {
                 Matrix<double>.Build.DenseOfArray(new[,]
                 {
@@ -430,11 +425,11 @@ namespace UnitTestGlaucon
                     }
                 })
             };
-           
-            // test reaction forces:
 
-            Matrix<double> sollReactions = Matrix<double>.Build.DenseOfArray(new[,]
-            {
+        // test reaction forces:
+
+        Matrix<double> sollReactions = Matrix<double>.Build.DenseOfArray(new[,]
+        {
                 {
                     7.4653330983e+01, 5.5993519745e+01, 6.4714921234e+01, 3.7307938424e+02, -5.0480217089e+02,
                     4.3034923725e+00,
@@ -469,9 +464,10 @@ namespace UnitTestGlaucon
                 }
             });
 
-
-            Matrix<double>[] sollPeakDispl = new[]
-            {
+        // for 3 loadcases:
+        Matrix<double>[] sollPeakDispl = new[]
+        {
+                // for each member:
                 Matrix<double>.Build.DenseOfArray(new[,]
                 {
                     {
@@ -528,9 +524,9 @@ namespace UnitTestGlaucon
                 })
             };
 
-            // check the peak forces:
-            Matrix<double>[] sollq = new[]
-            {
+        // check the peak forces:
+        Matrix<double>[] sollq = new[]
+        {
                 Matrix<double>.Build.DenseOfArray(new[,]
                 {
                     {-1.1077203e+02, -2.8593909e-03, 2.0747679e+00, 1.2887309e+00, 3.1282741e+02, 4.5727097e+00},
@@ -566,5 +562,5 @@ namespace UnitTestGlaucon
                 })
             };
 
-        }
     }
+}

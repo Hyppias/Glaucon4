@@ -9,33 +9,35 @@
 #endregion FileHeader
 
 using System;
-using System.Diagnostics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    [TestFixture]
+    public partial class UnitTestJ : UnitTestBase
     {
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException), "The construction is not restrained.")]
+        int result;
+        [Test]
         public void TestJ()
-        {
-            var TestObject = new TestJobject();
-            var param = TestObject.Param;
-            var glaucon = TestObject.Glaucon;
+        {           
             
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
-
+            
             // won't execute the following, because the expected exception will occur first
-            var result = glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
-            Assert.AreEqual(result, 0, $"Error executing {param.InputFileName}");
+            var ex  = Assert.Catch<InvalidOperationException>(() => GetGlaucon());
+            Assert.Throws<InvalidOperationException>(() => GetGlaucon());
+            
+            //Assert.AreEqual(result, 0, $"Error executing {Param.InputFileName}");
             foreach (var e in gl.Glaucon.Errors)
             {
                 Debug.WriteLine(e);
             }
             // the test will succeed, because the expected exception will occur
+        }
+
+        private void GetGlaucon()
+        {
+           result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
         }
     }
 }

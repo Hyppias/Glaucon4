@@ -4,8 +4,6 @@ using System.Linq;
 
 namespace Terwiel.Glaucon
 {
-
-
     // using static Math;
     public partial class Glaucon
     {

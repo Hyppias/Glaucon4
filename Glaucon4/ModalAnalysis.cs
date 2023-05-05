@@ -95,7 +95,7 @@ namespace Terwiel.Glaucon
                 switch (Param.ModalMethod)
                 {
                     case MKL:
-                        omega2 = new DenseVector(DoF);
+                        omega2 = new DenseVector(DoF); // square of omega
 
                         //AssembleSystemStiffnessMatrix(K, Members, !ReArrange);
                         //PrepK_M();
@@ -324,7 +324,8 @@ namespace Terwiel.Glaucon
                 } // end switch Param.ModalMethod
 
                 Array.Sort(omega2.AsArray());
-                eigenFreq = (DenseVector)omega2.PointwiseSqrt() / (2d * Math.PI);
+                // square root: rad/sec
+                eigenFreq = (DenseVector)omega2.PointwiseSqrt() / (2d * Math.PI); // bpm
                 // write modal results:
                 WriteModalResults();
             } // end try

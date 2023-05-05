@@ -1,14 +1,11 @@
 ﻿
-using System.ComponentModel.DataAnnotations;
-using System;
 using Terwiel.Glaucon;
-using Windows.UI.ViewManagement;
 using static Terwiel.Glaucon.Glaucon;
 using static Terwiel.Glaucon.Glaucon.LoadCase;
 
 namespace UnitTestGlaucon
 {
-    public class TestIobject
+    public partial class UnitTestI
     {
         public Parameters Param = new Parameters()
         {

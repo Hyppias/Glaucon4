@@ -16,7 +16,7 @@ using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
-    public partial class UnitTestGlaucon2
+    public partial class UnitTestRoll : UnitTestBase
     {
         [TestMethod]
         public void TestRoll()

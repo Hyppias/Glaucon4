@@ -9,20 +9,16 @@
 #endregion FileHeader
 
 using System;
-using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
+    [TestFixture]
     public partial class UnitTestE : UnitTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestE()
         {
-           
+
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
@@ -51,7 +47,7 @@ namespace UnitTestGlaucon
                 $"{Param.InputFileName} EigenFrequencies ");
 
             // test the resulting Reactions vector:
-           
+
 
             CheckVector(Glaucon.LoadCases[0].Reactions.Column(0), _reactions, 4,
                 $"{Param.InputFileName} Reactions ");
@@ -60,8 +56,14 @@ namespace UnitTestGlaucon
 
             CheckVector(Glaucon.LoadCases[0].Displacements.Column(0), soll, 2, $"{Param.InputFileName} Displacements ");
 
-            CheckMatrix(Glaucon.LoadCases[0].MinMaxForce, _minmax, 2,
-                $"{Param.InputFileName} MinMax ");
+            // this test has only ONE loadCase:
+
+            foreach (var mbr in Glaucon.Members)
+            {
+                CheckVector(mbr.minPeakForces, MinMax.Row(mbr.Nr * 2 + 1), 2, $"{Param.InputFileName} MinMax ");
+                CheckVector(mbr.maxPeakForces, MinMax.Row(mbr.Nr * 2), 2, $"{Param.InputFileName} MinMax ");
+            }
+
         }
     }
 }

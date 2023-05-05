@@ -5,8 +5,6 @@ VisualStudioVersion = 17.5.33530.505
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glaucon4", "Glaucon4\Glaucon4.csproj", "{8C453EAA-FCA9-49C8-8AEC-11134FC6E784}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Glaucon4.Test", "Glaucon4.Test\Glaucon4.Test.csproj", "{54E7C38A-234A-4DF9-B88B-0B5F9B8EDB85}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Glaucon4Test", "Glaucon4Test\Glaucon4Test.csproj", "{53D36B63-3B49-4C19-8C77-690EF85C9D3A}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{8C453EAA-FCA9-49C8-8AEC-11134FC6E784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C453EAA-FCA9-49C8-8AEC-11134FC6E784}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8C453EAA-FCA9-49C8-8AEC-11134FC6E784}.Release|Any CPU.Build.0 = Release|Any CPU
-		{54E7C38A-234A-4DF9-B88B-0B5F9B8EDB85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{54E7C38A-234A-4DF9-B88B-0B5F9B8EDB85}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{54E7C38A-234A-4DF9-B88B-0B5F9B8EDB85}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{54E7C38A-234A-4DF9-B88B-0B5F9B8EDB85}.Release|Any CPU.Build.0 = Release|Any CPU
 		{53D36B63-3B49-4C19-8C77-690EF85C9D3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{53D36B63-3B49-4C19-8C77-690EF85C9D3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53D36B63-3B49-4C19-8C77-690EF85C9D3A}.Release|Any CPU.ActiveCfg = Release|Any CPU

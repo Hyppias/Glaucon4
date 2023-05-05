@@ -9,21 +9,17 @@
 #endregion FileHeader
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Reflection;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
+    [TestFixture]
     public partial class UnitTestB : UnitTestBase
     {
-        [TestMethod]
+        [Test]
         public void TestB()
         {
-           
+
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
@@ -45,18 +41,18 @@ namespace UnitTestGlaucon
                 Assert.AreEqual(n[i, 5], lc1.PrescrDisplacements.Count, $"{Param.InputFileName} Load case {i + 1} Nr of pescr. displ");
             }
 
-
-            //Ku.PermuteColumns(gl.Glaucon.Perm);
-            //Ku.PermuteRows(gl.Glaucon.Perm);
-            //CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 3, 1e-13, $"{Param.InputFileName} Ku");
-            //Assert.AreEqual(Param.DynamicModesCount, 6, $"{file} Nr of dyn.modes nM");
-
+#if DEBUG
+            Ku.PermuteColumns(gl.Glaucon.Perm);
+            Ku.PermuteRows(gl.Glaucon.Perm);
+            CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 3,  $"{Param.InputFileName} Ku");
+            Assert.AreEqual(Param.DynamicModesCount, 6, $"Nr of dyn.modes nM");
+#endif
             var mbr = Glaucon.Members[0];
 
             Matrix<double> m = mbr.ConsistentMassMatrix();
             //CheckMatrix(m, sollCons, 5, $"{Param.InputFileName} ConsistentMassMatrix");
 
-           
+
             mbr = Glaucon.Members[0];
 
             m = mbr.LumpedMassMatrix();
@@ -68,13 +64,17 @@ namespace UnitTestGlaucon
                 CheckMatrix(Glaucon.Members[i].Gamma.SubMatrix(0, 3, 0, 3), sollg[i], 7,
                     $"{Param.InputFileName} Gamma for member {i + 1}");
             }
-
-            foreach(var mb in  Glaucon.Members)
+            // check end forces
+            foreach (var ld in Glaucon.LoadCases)
             {
-                var Q1 = mbr.Q;
-                    CheckVector(Q1, sollQ[mb.Nr].Row(mb.Nr), 2,
-                        $"{Param.InputFileName} EndForces for member {mb.Nr+1}");
-              
+                var Q1 = ld.Q;
+                foreach (var mb in Glaucon.Members)
+                {
+                    var mbrQ = Q1.Row(mb.Nr);
+                    CheckVector(mbrQ, sollEndForces[mb.Nr].Row(mb.Nr), 2,
+                      $"{Param.InputFileName} EndForces for member {mb.Nr + 1}");
+
+                }
             }
 
             //soll = soll.Transpose();
@@ -91,26 +91,32 @@ namespace UnitTestGlaucon
             }
 
             // Test frequencies:
-            var sollv = (DenseVector) Vector<double>.Build.DenseOfArray(new[]
+            var sollv = (DenseVector)Vector<double>.Build.DenseOfArray(new[]
                 {18.807943, 19.105451, 19.690439, 31.711570, 35.159165, 42.248953});
             //Assert.AreEqual( 3,gl.Glaucon.Param.FrequenciesFound,  "Eigenfrequensies found: ");
 
             CheckVector(gl.Glaucon.eigenFreq, sollv, 3, $"{Param.InputFileName} EigenFrequencies ");
 
-            
-            foreach( var mb in Glaucon.Members)
+            foreach (var ld in Glaucon.LoadCases)
             {
-                CheckVector(mb.maxPeakDisplacements, sollPeakDispl[mb.Nr], 3,
-                    $"{Param.InputFileName} Maximum Peak Displacements {mb.Nr + 1}");
-                CheckVector(mb.minPeakDisplacements, sollPeakDispl[mb.Nr], 3,
-                    $"{Param.InputFileName} Minimum Peak Displacements member {mb.Nr + 1}");
+                foreach (var mb in Glaucon.Members)
+                {
+                    CheckVector(mb.maxPeakDisplacements, sollPeakDispl[ld.Nr].Row(mb.Nr), 3,
+                        $"{Param.InputFileName} Maximum Peak Displacements {mb.Nr + 1}");
+                    CheckVector(mb.minPeakDisplacements, sollPeakDispl[ld.Nr].Row(mb.Nr), 3,
+                        $"{Param.InputFileName} Minimum Peak Displacements member {mb.Nr + 1}");
+                }
             }
 
-            foreach(var mb in Glaucon.Members)
+            foreach (var ld in Glaucon.LoadCases)
             {
-                CheckVector(mb.maxPeakForces, 4,$"{Param.InputFileName} Maximum Peak forces  member {mb.Nr+ 1}");
-                CheckVector(mb.minPeakForces, sollq[mb.Nr], 4,$"{Param.InputFileName} Minimum Peak forces , member {mb.Nr + 1}");
+                foreach (var mb in Glaucon.Members)
+                {
+                    CheckVector(mb.maxPeakForces, sollPeakDispl[ld.Nr].Row(mb.Nr), 4, $"{Param.InputFileName} Maximum Peak forces  member {mb.Nr + 1}");
+                    CheckVector(mb.minPeakForces, sollEndForces[ld.Nr].Row(mb.Nr), 4, $"{Param.InputFileName} Minimum Peak forces , member {mb.Nr + 1}");
+                }
             }
+
 
             Debug.WriteLine("Exit " + MethodBase.GetCurrentMethod().Name);
         }
