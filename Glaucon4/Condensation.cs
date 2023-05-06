@@ -243,7 +243,7 @@ namespace Terwiel.Glaucon
 
             for (var i = 0; i < DoF; i++)
             {
-                if (Restraints[i] == 0)
+                if (GlobalRestraints[i] == 0)
                 {
                     traceM += M[i, i];
                 }

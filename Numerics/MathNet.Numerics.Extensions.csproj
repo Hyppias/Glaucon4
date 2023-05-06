@@ -1,0 +1,28 @@
+﻿
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageId>MathNet.Numerics.Extensions</PackageId>
+    <Description>Extensions to the Math.NET Numerics software package.</Description>
+    <Product>MathNet.Numerics.Extensions</Product>
+    <Authors>Christian Woltering</Authors>
+    <AssemblyVersion>5.0.0.0</AssemblyVersion>
+    <FileVersion>5.0.0.0</FileVersion>
+    <PackageTags>mathnet numerics</PackageTags>
+    <Version>5.0.0</Version>
+    <AssemblyName>MathNet.Numerics.Extensions</AssemblyName>
+    <RootNamespace>MathNet.Numerics</RootNamespace>
+    <PackageLicenseExpression>LGPL-2.1-only</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/wo80/mathnet-extensions</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/wo80/mathnet-extensions</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <OutDir>$(SolutionDir)bin\$(Configuration)</OutDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MathNet.Numerics" Version="5.0.0" />
+  </ItemGroup>
+</Project>

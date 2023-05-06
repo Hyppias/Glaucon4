@@ -16,6 +16,7 @@ namespace UnitTestGlaucon
     [TestFixture]
     public partial class UnitTestB : UnitTestBase
     {
+         public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestB()
         {
@@ -23,29 +24,29 @@ namespace UnitTestGlaucon
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
-            Assert.AreEqual(0, result, $"{Param.InputFileName} Exit code Glaucon");
-            Assert.AreEqual(4, Glaucon.Members.Count, $"{Param.InputFileName} Nr of members");
-            Assert.AreEqual(5, Glaucon.Nodes.Count, $"{Param.InputFileName} Nr of nodes");
-            Assert.AreEqual(4, Glaucon.NodeRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
-            Assert.AreEqual(3, Glaucon.LoadCases.Count, $"{Param.InputFileName} Nr of load cases");
+            Assert.That(0== result, $"{Param.InputFileName} Exit code Glaucon");
+            Assert.That(4== Glaucon.Members.Count, $"{Param.InputFileName} Nr of members");
+            Assert.That(5== Glaucon.Nodes.Count, $"{Param.InputFileName} Nr of nodes");
+            Assert.That(4== Glaucon.NodeRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
+            Assert.That(3== Glaucon.LoadCases.Count, $"{Param.InputFileName} Nr of load cases");
 
             for (var i = 0; i < Glaucon.LoadCases.Count; i++)
             {
                 var lc1 = Glaucon.LoadCases[i];
                 Assert.IsNotNull(lc1, $"Load case {i + 1} set to NULL");
-                Assert.AreEqual(n[i, 0], lc1.NodalLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of loaded nodes");
-                Assert.AreEqual(n[i, 1], lc1.UniformLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of uniform loads");
-                Assert.AreEqual(n[i, 2], lc1.TrapLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of Trap loads");
-                Assert.AreEqual(n[i, 3], lc1.IntPointLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of Conc. loads");
-                Assert.AreEqual(n[i, 4], lc1.TempLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of temperature loads");
-                Assert.AreEqual(n[i, 5], lc1.PrescrDisplacements.Count, $"{Param.InputFileName} Load case {i + 1} Nr of pescr. displ");
+                Assert.That(n[i, 0]== lc1.NodalLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of loaded nodes");
+                Assert.That(n[i, 1]== lc1.UniformLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of uniform loads");
+                Assert.That(n[i, 2]== lc1.TrapLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of Trap loads");
+                Assert.That(n[i, 3]== lc1.IntPointLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of Conc. loads");
+                Assert.That(n[i, 4]==lc1.TempLoads.Count, $"{Param.InputFileName} Load case {i + 1} Nr of temperature loads");
+                Assert.That(n[i, 5]== lc1.PrescrDisplacements.Count, $"{Param.InputFileName} Load case {i + 1} Nr of pescr. displ");
             }
 
 #if DEBUG
             Ku.PermuteColumns(gl.Glaucon.Perm);
             Ku.PermuteRows(gl.Glaucon.Perm);
             CheckMatrix(Glaucon.LoadCases[0].Ku, Ku, 3,  $"{Param.InputFileName} Ku");
-            Assert.AreEqual(Param.DynamicModesCount, 6, $"Nr of dyn.modes nM");
+            Assert.That(Param.DynamicModesCount==6, $"Nr of dyn.modes nM");
 #endif
             var mbr = Glaucon.Members[0];
 
@@ -93,7 +94,7 @@ namespace UnitTestGlaucon
             // Test frequencies:
             var sollv = (DenseVector)Vector<double>.Build.DenseOfArray(new[]
                 {18.807943, 19.105451, 19.690439, 31.711570, 35.159165, 42.248953});
-            //Assert.AreEqual( 3,gl.Glaucon.Param.FrequenciesFound,  "Eigenfrequensies found: ");
+            //Assert.That( 3,gl.Glaucon.Param.FrequenciesFound,  "Eigenfrequensies found: ");
 
             CheckVector(gl.Glaucon.eigenFreq, sollv, 3, $"{Param.InputFileName} EigenFrequencies ");
 

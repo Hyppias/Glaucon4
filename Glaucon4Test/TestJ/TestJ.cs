@@ -15,6 +15,7 @@ namespace UnitTestGlaucon
     [TestFixture]
     public partial class UnitTestJ : UnitTestBase
     {
+         public DenseMatrix? deflection , Reactions, EndForces;
         int result;
         [Test]
         public void TestJ()
@@ -27,7 +28,7 @@ namespace UnitTestGlaucon
             var ex  = Assert.Catch<InvalidOperationException>(() => GetGlaucon());
             Assert.Throws<InvalidOperationException>(() => GetGlaucon());
             
-            //Assert.AreEqual(result, 0, $"Error executing {Param.InputFileName}");
+            //Assert.That(result, 0, $"Error executing {Param.InputFileName}");
             foreach (var e in gl.Glaucon.Errors)
             {
                 Debug.WriteLine(e);

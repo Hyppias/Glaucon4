@@ -8,12 +8,6 @@
 // of the programmer, owner and/or copyrightholder.
 #endregion FileHeader
 
-using System.Diagnostics;
-using System.Reflection;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {

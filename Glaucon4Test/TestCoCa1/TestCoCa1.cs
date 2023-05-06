@@ -9,16 +9,13 @@
 #endregion FileHeader
 
 using System.Collections.Generic;
-using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
     public partial class UnitTestCoCa1 : UnitTestBase
-    {
+    { 
+        public DenseMatrix? deflection , Reactions, EndForces;
+
         [Test]
         public void TestCoCa1()
         {            
@@ -26,7 +23,7 @@ namespace UnitTestGlaucon
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
 
-            Assert.AreEqual(result, 0, $"Error computing {Param.InputFileName}");
+            Assert.That(result== 0, $"Error computing {Param.InputFileName}");
             // test the force vector
 
 #if DEBUG

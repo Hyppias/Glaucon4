@@ -15,6 +15,7 @@ namespace UnitTestGlaucon
     [TestFixture]
     public partial class UnitTestE : UnitTestBase
     {
+         public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestE()
         {
@@ -30,7 +31,7 @@ namespace UnitTestGlaucon
                 Console.WriteLine(e);
             }
 
-            Assert.AreEqual(result, 0, $"Error computing {Param.InputFileName}");
+            Assert.That(result== 0, $"Error computing {Param.InputFileName}");
 
 #if DEBUG
             Ku.PermuteColumns(gl.Glaucon.Perm);

@@ -39,9 +39,7 @@ namespace Terwiel.Glaucon
             meshPath = $"{BaseFile}_mesh.plt"; // undeformed mesh
             lw = 1; // line width of deformed mesh
 
-            // write gnuplot plotting script commands
-
-            Dim3 = Space.Length == 3;
+            // write gnuplot plotting script commands           
 
             // Build the Control script.
             // write header, plot-setup cmds, node label, and element label data			

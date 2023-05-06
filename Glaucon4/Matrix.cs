@@ -468,7 +468,7 @@ namespace Terwiel.Glaucon
                 {
                     diag[j] = 0.0;
 
-                    if (Restraints[j] ==0)
+                    if (GlobalRestraints[j] ==0)
                     {
                         // reduce column j, except where restraintsNot[i]==0	
                         var m = 0;
@@ -486,12 +486,12 @@ namespace Terwiel.Glaucon
 
                         for (var i = m; i < j; i++)
                         {
-                            if (Restraints[i] == 0)
+                            if (GlobalRestraints[i] == 0)
                             {
                                 A[j, i] = A[i, j];
                                 for (var k = m; k < i; k++)
                                 {
-                                    if (Restraints[k] == 0)
+                                    if (GlobalRestraints[k] == 0)
                                     {
                                         A[j, i] -= A[j, k] * A[i, k];
                                     }
@@ -502,7 +502,7 @@ namespace Terwiel.Glaucon
                         diag[j] = A[j, j];
                         for (var i = m; i < j; i++)
                         {
-                            if (Restraints[i] == 0)
+                            if (GlobalRestraints[i] == 0)
                             {
                                 diag[j] -= A[j, i] * A[j, i] / diag[i];
                             }
@@ -510,7 +510,7 @@ namespace Terwiel.Glaucon
 
                         for (var i = m; i < j; i++)
                         {
-                            if (Restraints[i] == 0)
+                            if (GlobalRestraints[i] == 0)
                             {
                                 A[j, i] /= diag[i];
                             }
@@ -536,12 +536,12 @@ namespace Terwiel.Glaucon
 
                 for (var i = 0; i < n; i++)
                 {
-                    if (Restraints[i] == 0)
+                    if (GlobalRestraints[i] == 0)
                     {
                         x[i] = b[i];
                         for (var j = 0; j < n; j++)
                         {
-                            if (Restraints[j] == 1)
+                            if (GlobalRestraints[j] == 1)
                             {
                                 x[i] -= A[i, j] * x[j];
                             }
@@ -552,11 +552,11 @@ namespace Terwiel.Glaucon
                 // {x} is run through the same forward reduction as was [A]
                 for (var i = 0; i < n; i++)
                 {
-                    if (Restraints[i] == 0)
+                    if (GlobalRestraints[i] == 0)
                     {
                         for (var j = 0; j < i; j++)
                         {
-                            if (Restraints[j] == 0)
+                            if (GlobalRestraints[j] == 0)
                             {
                                 x[i] -= A[i, j] * x[j];
                             }
@@ -566,7 +566,7 @@ namespace Terwiel.Glaucon
 
                 for (var i = 0; i < n; i++)
                 {
-                    if (Restraints[i] == 0)
+                    if (GlobalRestraints[i] == 0)
                     {
                         x[i] /= diag[i];
                     }
@@ -576,11 +576,11 @@ namespace Terwiel.Glaucon
 
                 for (var i = n - 1; i > 0; i--)
                 {
-                    if (Restraints[i] == 0)
+                    if (GlobalRestraints[i] == 0)
                     {
                         for (var j = 0; j < i; j++)
                         {
-                            if (Restraints[j] == 0)
+                            if (GlobalRestraints[j] == 0)
                             {
                                 x[j] -= A[i, j] * x[i];
                             }
@@ -593,7 +593,7 @@ namespace Terwiel.Glaucon
                 for (var i = 0; i < n; i++)
                 {
                     c[i] = 0.0;
-                    if (Restraints[i] == 1)
+                    if (GlobalRestraints[i] == 1)
                     {
                         c[i] = -b[i]; // changed from 0.0 to -b[i]; 2014-05-14
                         for (var j = 0; j < n; j++)

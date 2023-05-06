@@ -91,7 +91,7 @@ namespace Terwiel.Glaucon
 
             public double EMs; // Extra mass on member
 
-            private readonly int nA, nB;
+            public int nA, nB;
             [XmlIgnore]
             [Description("Member stiffness matrix in global coord")]
             public DenseMatrix k;
@@ -108,8 +108,9 @@ namespace Terwiel.Glaucon
             public Member(int nr, int ndA, int ndB, double[] as_, double[] iz ,double[] material, double roll, bool active = true)
             {
                 Nr = nr;
-                nA = ndA;
-                nB = ndB;
+                nA = ndA-1;
+                nB = ndB-1;
+
                 As = DenseVector.OfArray(as_);
                 Iz = DenseVector.OfArray(iz);
                 As = as_;
@@ -120,10 +121,11 @@ namespace Terwiel.Glaucon
                 //Iz[0] = iz[0];
                 //Iz[1] = iz[1];
                 //Iz[2] = iz[2];
-                Mat.Alpha = material[3];
-                Mat.Density = material[2];
-                Mat.G = material[1];
-                Mat.E = material[0];
+                Mat = new Material(material[0],material[1],material[2],material[3]);
+                //Mat.Alpha = material[3];
+                //Mat.Density = material[2];
+                //Mat.G = material[1];
+                //Mat.E = material[0];
                 Roll = roll;
                 Active = true; // members may never be made inactive.
             }

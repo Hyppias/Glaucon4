@@ -15,6 +15,7 @@ namespace UnitTestGlaucon
     [TestFixture]
     public partial class UnitTestC : UnitTestBase
     {
+         public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestC()
         {
@@ -22,7 +23,7 @@ namespace UnitTestGlaucon
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
 
-            Assert.AreEqual(result, 0, $"Error computing {Param.InputFileName}");
+            Assert.That(result== 0, $"Error computing {Param.InputFileName}");
             // test the force vector
 
             //for (int i = 0; i < Glaucon.LoadCases.Length; i++)

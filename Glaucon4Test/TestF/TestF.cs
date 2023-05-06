@@ -9,17 +9,13 @@
 #endregion FileHeader
 
 using System.Collections.Generic;
-using System.Diagnostics;
-using MathNet.Numerics.LinearAlgebra;
-using MathNet.Numerics.LinearAlgebra.Double;
-using gl = Terwiel.Glaucon;
-using NUnit.Framework;
 
 namespace UnitTestGlaucon
 {
     [TestFixture]
     public partial class UnitTestF : UnitTestBase
     {
+         public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestF()
         {            
@@ -33,7 +29,7 @@ namespace UnitTestGlaucon
                 Debug.WriteLine(e);
             }
 
-            Assert.AreEqual(result, 0, $"Error computing {Param.InputFileName}");
+            Assert.That(result== 0, $"Error computing {Param.InputFileName}");
             // test the force vector
 
          

@@ -12,13 +12,16 @@
 
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing.Text;
 using System.Globalization;
 using System.Reflection;
 using System.Xml.Serialization;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra.Double;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Schema;
 using Newtonsoft.Json.Serialization;
+using Windows.UI.Core;
 
 namespace Terwiel.Glaucon
 {
@@ -348,7 +351,7 @@ namespace Terwiel.Glaucon
 
         [XmlAttribute("Dimensionality"), JsonIgnore]
         [Description("dimensions of the construction: X, Y, Z")]
-        public string Space { get; set; }
+        public char[] Space;
 
         [XmlElement("Title"), JsonProperty("Title")]
         [Description("Description of the construction")]
@@ -384,7 +387,7 @@ namespace Terwiel.Glaucon
 
         public List<NodeRestraint> NodesRestraints;
 
-        public int[] Restraints;
+        public int[] GlobalRestraints;
 
         #endregion
 
@@ -394,11 +397,12 @@ namespace Terwiel.Glaucon
         {
         }
 
-        public Glaucon(
-            string title,
-            List<Node> nodes,
-            List<(int, int[])> restraints,
-            List<Member> members,
+        public void ProcessGlaucon(
+            //string title,
+            //List<Node> nodes,
+            //List<(int, int[])> restraints,
+            //List<Member> members,
+            //List<LoadCase> loadCases,
             Parameters parm
             )
         {
@@ -424,29 +428,29 @@ namespace Terwiel.Glaucon
             //Debug.WriteLine($"Machine precision {MachinePrecision = NativeMethods.MachinePrecision('E')}");
             //Debug.WriteLine($"Nr. of digits in mantissa {NativeMethods.MachinePrecision('n')}");
             //Debug.WriteLine($"Base of the machine {NativeMethods.MachinePrecision('B')}");
-            BaseFile = Path.GetFileNameWithoutExtension(Param.InputFileName);
-            if (!Directory.Exists(Param.InputPath))
-            {
-                throw new DirectoryNotFoundException($"{Param.InputPath} does not exist");
-            }
 
-            if (!File.Exists($"{Param.InputPath}{Param.InputFileName}"))
+            if (parm.InputSource == OBJECT)
             {
-                throw new FileNotFoundException($"{Param.InputFileName} not found.");
-            }
-
-            if (!Directory.Exists(Param.OutputPath))
-            {
-                Directory.CreateDirectory(Param.OutputPath);
-            }
-
-            if (parm.InputSource.Equals("OBJECT"))
-            {
-
                 ProcessInput();
             }
             else
-            {
+            { // InputSource = JSON
+
+                BaseFile = Path.GetFileNameWithoutExtension(Param.InputFileName);
+                if (!Directory.Exists(Param.InputPath))
+                {
+                    throw new DirectoryNotFoundException($"{Param.InputPath} does not exist");
+                }
+
+                if (!File.Exists($"{Param.InputPath}{Param.InputFileName}"))
+                {
+                    throw new FileNotFoundException($"{Param.InputFileName} not found.");
+                }
+
+                if (string.IsNullOrEmpty(Param.OutputPath))
+                {
+                    Directory.CreateDirectory(Param.OutputPath);
+                }
                 Param = ReadJsonFile<Parameters>($"{parm.InputPath}Params.json", $"{parm.InputPath}ParamSchemaFile.json");
                 ReadDefaultInput(this, $"{parm.InputPath}DefaultInputData.json");
                 ProcessJsonInput();
@@ -476,35 +480,46 @@ namespace Terwiel.Glaucon
             s.Start();
 #endif
             //Lg(Param.title);
-            // correct restraints:
-            var dim = new int[3];
+            // adjust node, restraint and member numbers to base 0:
+            Nodes.Sort((i, j) => i.Nr.CompareTo(j.Nr));
+            int seqCheck = 0;
+            foreach (var nd in Nodes)
+            {
+                nd.Nr--;
+                SeqCheck(nd.Nr, "Node");
+                nd.Restraints = new[] { 0, 0, 0, 0, 0, 0 }; //ALL free
+            }
+            Members.Sort((i, j) => i.Nr.CompareTo(j.Nr));
+            seqCheck = 0;
+            foreach (var mbr in Members)
+            {
+                mbr.Nr--;
+                //nA and nB were decremented in the constructor
+                mbr.NodeA = Nodes[mbr.nA];
+                mbr.NodeB = Nodes[mbr.nB];
+
+                SeqCheck(mbr.Nr, "Member");
+            }
+            NodesRestraints.Sort((i, j) => i.NodeNr.CompareTo(j.NodeNr));
+            foreach (var nr in NodesRestraints)
+            {
+                nr.NodeNr--;
+            }
+
+            //var dim = new int[3];
+            Space = new char[3];
+            int k = 0;
+            foreach (var nr in NodesRestraints)
+            {
+                Nodes[nr.NodeNr].Restraints = nr.Restraints;
+            }
+
             for (int i = 0; i < 3; i++)
             {
-                for (int j = 1; j < Nodes.Count; j++)
+                //dim[i] = Nodes.Any(x => x.Coord[i] != Nodes.First().Coord[i]);
+                if (Nodes.Any(x => x.Coord[i] != Nodes.First().Coord[i]))
                 {
-                    var node = Nodes[j];
-                    if (node.Nr >= Nodes.Count) // check node number, while we are here
-                    {
-                        throw new ArgumentException($"Wrong node nr {node.Nr}");
-                    }
-                    if (Nodes[0].Coord[i] != Nodes[j].Coord[i])
-                    {
-                        dim[i] = 1;// dimension X, Y or Z is present
-                        Lg($"{("XYZ"[i])} dimension is present");
-                        break;
-                    }
-                }
-            }
-            for (int j = 0; j < Nodes.Count; j++)
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    if (dim[i] == 0)
-                    {
-                        // if diemnsion[i] is not present, the corresponding DoF must be 'fixed' (=1)
-                        Nodes[j].Restraints[i] = Nodes[j].Restraints[i + 3] = 1;
-                        Lg($"Node {Nodes[j].Nr}, Restraints {i} and {i + 3} corrected.");
-                    }
+                    Space[k++] = "XYZ"[i];
                 }
             }
 
@@ -515,9 +530,9 @@ namespace Terwiel.Glaucon
             Lg($"{NodeRestraints.Count} restrained nodes.");
             // now set up the DoF vector:
             matrixPart = DoF;
-            Restraints = new int[DoF];
+            GlobalRestraints = new int[DoF];
             // NodeRestraints is a list of only restrained nodes
-            foreach (var nr in NodeRestraints)
+            foreach (var nr in NodesRestraints)
             {
                 var nodeNr = nr.NodeNr;
                 var restr = nr.Restraints; // int[6]
@@ -526,10 +541,10 @@ namespace Terwiel.Glaucon
                     // read restraints: 0 = not restrained (free), other value = fixed = false.
                     var n = restr[j];
                     // Restraints is  int[DoF]
-                    Restraints[(nodeNr * 6) + j] = n;
+                    GlobalRestraints[(nodeNr * 6) + j] = n;
                     // one of the 6 degrees of freedon of the construction may not be
                     // unconstrained:
-                    matrixPart -= n == 0 ? 0 : 1;
+                    matrixPart -= n;
                 }
             }
 
@@ -537,12 +552,22 @@ namespace Terwiel.Glaucon
             // index[i] says where a vector element or matrix row/column should go when permuting.
             var index = new int[DoF]; // use for Permutation
             var j1 = 0;
-            var j2 = 0;
+            var j2 = DoF - matrixPart;
             for (var i = 0; i < DoF; i++)
             {
-                index[i] = Restraints[i] != 0 ? j1++ : matrixPart + j2++;
+                if (GlobalRestraints[i] == 1)
+                {
+                    index[j1] = i;
+                    j1++;
+                }
+                else
+                {
+                    index[j2] = i;
+                    j2++;
+                }
+                //index[i] = GlobalRestraints[i] == 1 ? j1++ : j2++;
             }
-
+            //TODO: check this!
             perm = new Permutation(index);
 
             Lg($"{Members.Count} members.");
@@ -556,11 +581,14 @@ namespace Terwiel.Glaucon
                         throw new ArgumentOutOfRangeException("Node Not Used");
                     }
                 }
+                // check for duplicates
                 foreach (var mbr in Members)
                 {
                     for (var j = mbr.Nr + 1; j < Members.Count; j++)
                     {
-                        if (mbr.NodeA == Members[j].NodeA && mbr.NodeB == Members[j].NodeB)
+                        // duplicate members?
+                        if ((mbr.nA == Members[j].nA && mbr.nA == Members[j].nB) ||
+                                (mbr.nA == Members[j].nB && mbr.nA == Members[j].nA))
                         {
                             throw new ArgumentOutOfRangeException($"Two members are the same: {mbr.Nr + 1} and {j + 1}");
                         }
@@ -570,20 +598,29 @@ namespace Terwiel.Glaucon
                 {
                     foreach (var displ in lc.PrescrDisplacements)
                     {
-                        var restr = Nodes[displ.NodeNr ].Restraints;
+                        var restr = Nodes[displ.NodeNr].Restraints;
                         for (int i = 0; i < 6; i++)
                         {
-                            if(restr[i] == 0 &&  Globals.AlmostEqual(displ.Displacements[i], 1e-12))
+                            if (restr[i] == 0 && Globals.AlmostEqual(displ.Displacements[i], 1e-12))
                             {
                                 string m = "";
                                 restr[i] = 1;
-                                Lg(m = $"Load case {lc.Nr+1}, displacement {i+1} for node {displ.NodeNr+1} too small.\n"
+                                Lg(m = $"Load case {lc.Nr + 1}, displacement {i + 1} for node {displ.NodeNr + 1} too small.\n"
                                     + " Is set as fixed");
                                 throw new ArgumentOutOfRangeException(m);
                             }
                         }
                     }
                 }
+            }
+
+            void SeqCheck(int nr, string name)
+            {
+                if (seqCheck != nr)
+                {
+                    throw new ArgumentException($"{name} number {nr + 1} out of sequence");
+                }
+                seqCheck++;
             }
 
             // Parallel.ForEach(members, mb => { mb.SetupGamma(nodes[mb.NodeA], nodes[mb.NodeB]); });
@@ -617,12 +654,11 @@ namespace Terwiel.Glaucon
                     structMass += mbr.Mass;
                 }
             }
-            
-             
-            ReadCondensationData();
 
-
-
+            if (Param.ModalMethod != None)
+            {
+                ReadCondensationData();
+            }
 #if DEBUG
             s.Stop();
             Debug.WriteLine($"Elapsed computing time for processing input: {s.ElapsedMilliseconds} msec.");

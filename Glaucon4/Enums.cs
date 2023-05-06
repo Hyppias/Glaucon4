@@ -28,6 +28,8 @@ namespace Terwiel.Glaucon
         const int MKL = 5;
         const int FEAST = 6;
 
+        const int OBJECT = 1;
+        const int JSON = 0;
 
         const int HTML = 1;
         const int Latex = 2;

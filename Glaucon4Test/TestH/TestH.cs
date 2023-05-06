@@ -15,21 +15,22 @@ namespace UnitTestGlaucon
 {
     public partial class UnitTestH : UnitTestBase 
         {
+         public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestH()
         {
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
-            Assert.AreEqual(result, 0, $"Error computing {Param.InputFileName}");
+            Assert.That(result == 0, $"Error computing {Param.InputFileName}");
 
-            Assert.AreEqual(295, Glaucon.Members.Count, $"{Param.InputFileName} Nr of members");
-            Assert.AreEqual(148, Glaucon.Nodes.Count, $"{Param.InputFileName} Nr of nodes");
-            Assert.AreEqual(36, Glaucon.NodeRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
-            Assert.AreEqual(1, Glaucon.LoadCases.Count, $"{Param.InputFileName} Nr of load cases ");
-            Assert.AreEqual(0, Glaucon.LoadCases[0].NodalLoads.Count, $"{Param.InputFileName} # loaded nodes");
-            Assert.AreEqual(166, Glaucon.LoadCases[0].UniformLoads.Count, $"{Param.InputFileName} # uniform loads");
-            Assert.AreEqual(5, Param.DynamicModesCount, $"{Param.InputFileName} # modes");
+            Assert.That(295 ==  Glaucon.Members.Count, $"{Param.InputFileName} Nr of members");
+            Assert.That(148 ==  Glaucon.Nodes.Count, $"{Param.InputFileName} Nr of nodes");
+            Assert.That(36 ==  Glaucon.NodeRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
+            Assert.That(1 ==  Glaucon.LoadCases.Count, $"{Param.InputFileName} Nr of load cases ");
+            Assert.That(0 ==  Glaucon.LoadCases[0].NodalLoads.Count, $"{Param.InputFileName} # loaded nodes");
+            Assert.That(166 ==  Glaucon.LoadCases[0].UniformLoads.Count, $"{Param.InputFileName} # uniform loads");
+            Assert.That(5 ==  Param.DynamicModesCount, $"{Param.InputFileName} # modes");
             // test the force vector
           
             foreach (var lc in Glaucon.LoadCases)

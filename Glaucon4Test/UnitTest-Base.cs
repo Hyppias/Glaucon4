@@ -5,6 +5,7 @@ using NUnit.Framework;
 using System.Diagnostics;
 using System.Globalization;
 using System.Reflection;
+using Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
@@ -12,17 +13,11 @@ namespace UnitTestGlaucon
     public class UnitTestBase
     {
         public const string pathName = @"E:\Users\erik\Documents\Visual Studio 2022\Projects\Glaucon4\Glaucon4Test\Resources\";
-
-        public DenseMatrix deflection, Reactions, EndForces;
-
-        public UnitTestBase()
-        {
-            
-        }
-
+        public DenseMatrix? deflection, Reactions, EndForces;
+        public Glaucon Glaucon;
         // Use SetUp to run code before running the first test in the class
         [SetUp]
-        public static void MyClassInitialize(TestContext testContext)
+        public static void MyClassInitialize()
         {
             Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
             var resultsDir = pathName + @"Results\";
@@ -43,6 +38,7 @@ namespace UnitTestGlaucon
             var nf = culture.NumberFormat.NumberDecimalSeparator;
             Assert.IsTrue(nf.Equals("."), "Error: Culture's decimal separator must be '.'");
             //bw = new BinaryWriter(ms = new MemoryStream());
+
             Debug.WriteLine("Exit " + MethodBase.GetCurrentMethod().Name);
         }
         // Use TestInitialize to run code before running each test 
@@ -52,7 +48,7 @@ namespace UnitTestGlaucon
             @"E:\Users\erik\Documents\Visual Studio 2023\Projects\Glaucon4\Glaucon4\bin\Debug\net6.0-windows10.0.22621.0\MKL"
             ;
 
-        [SetUp]
+        //[SetUp]
         public void MyTestInitialize()
         {
 

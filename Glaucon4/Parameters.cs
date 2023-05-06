@@ -18,13 +18,16 @@ namespace Terwiel.Glaucon
         /// limit above which members are in danger of buckling.
         /// </summary>
         public double StrainLimit;
+        /// <summary>
+        /// Zoom scale
+        /// </summary>
         public double Scale;
         public double Shift;
         /// <summary>
         /// account for geometric (in)stability?
         /// </summary>
         public bool AccountForGeomStability ;
-        public bool ConsistentMassMatrix;
+        //public bool ConsistentMassMatrix;
         /// <summary>
         /// Equilibrium tolerance for geometric stability calculation
         /// </summary>
@@ -122,9 +125,18 @@ namespace Terwiel.Glaucon
         
         public int CondensationMethod; // 1 = static, 2 = Guyan, 3 = Dynamic 
 
+        /// <summary>
+        /// Show the picture of the construction exaggerated
+        /// </summary>
         public double DeformationExaggeration;
 
+        /// <summary>
+        /// What method to use for condenssation
+        /// </summary>
         public int ModalMethod ; // 0 = none, 1 = subspace-Jacobi, 2 = Stodola
+        /// <summary>
+        
+        /// </summary>
         public int DynamicModesCount; // formerly nM
         public double ModalExaggeration;
         

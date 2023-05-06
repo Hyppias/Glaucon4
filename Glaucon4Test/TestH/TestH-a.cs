@@ -9,10 +9,6 @@
 #endregion FileHeader
 
 
-using MathNet.Numerics.LinearAlgebra;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using MathNet.Numerics.LinearAlgebra.Double;
-
 namespace UnitTestGlaucon
 {
     public partial class UnitTestH

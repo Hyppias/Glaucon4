@@ -18,7 +18,10 @@ using System.Xml.Serialization;
 using MathNet.Numerics.LinearAlgebra;
 using Mkl;
 using MathNet.Numerics.LinearAlgebra.Double;
+
 using Newtonsoft.Json;
+using MathNet.Numerics.LinearAlgebra.Factorization;
+using System.Numerics;
 
 namespace Terwiel.Glaucon
 {
@@ -47,7 +50,7 @@ namespace Terwiel.Glaucon
             for (var j = 0; j < DoF; j++)
             //  compute traceK and traceM
             {
-                if (Restraints[j] == 0)
+                if (GlobalRestraints[j] == 0)
                 {
                     TraceK += K[j, j];
                     TraceM += M[j, j];
@@ -57,7 +60,7 @@ namespace Terwiel.Glaucon
             for (var i = 0; i < DoF; i++)
             //  modify K and M for reactions
             {
-                if (Restraints[i] == 1)
+                if (GlobalRestraints[i] == 1)
                 {
                     // apply reactions to upper triangle
                     K[i, i] = TraceK * 1e4;
@@ -94,6 +97,30 @@ namespace Terwiel.Glaucon
 
                 switch (Param.ModalMethod)
                 {
+                    case 7:
+                        // Cholesky factor of B.
+                        var L = M.Cholesky().Factor;
+
+                        // Compute L^-1.
+                        InvertLowerTriangle((DenseMatrix)L);
+
+                        // Compute L^-t = (L^-1)^t.
+                        var Lt = L.Transpose();
+
+                        // Save L^-t for recovery of eigenvectors.
+                        var copy = (DenseMatrix)Lt.Clone();
+
+                        // Build L^-1 * A * L^-t
+                        A.Multiply(Lt, Lt);
+                        L.Multiply(Lt, Lt);
+
+                        var evd = Lt.Evd(Symmetricity.Symmetric);
+
+                        // Recover eigenvectors.
+                        copy.Multiply(evd.EigenVectors, E);
+
+                        return evd.EigenValues;
+                        break;
                     case MKL:
                         omega2 = new DenseVector(DoF); // square of omega
 
