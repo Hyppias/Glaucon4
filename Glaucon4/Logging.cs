@@ -1,17 +1,13 @@
 ﻿using Serilog;
 using System.Diagnostics;
-
 using Serilog.Formatting.Json;
 
 namespace Terwiel.Glaucon
 {
-
     public partial class Glaucon
     {
-
         public static void CreateLog()
         {
-
             if (Param.KeepLog)
             {
                 Log.Logger =

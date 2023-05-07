@@ -34,16 +34,17 @@ public partial class UnitTestA
         Decimals = 2,
         ModalMethod = 0, // 5 = MKL, 2 = STODOLA, 1 = SUBSPACE, 6 = FEAST, 3 = RANGE, 0 = None
         Scale = 1.0,
-        //ConsistentMassMatrix = true,
         //LumpedMassMatrix = true,
         DynamicModesCount = 0,
         PanRate = 2.0,
         Shift = 10.0,
         InputSource = 1, // object
+        OutputPath= @"E:\Users\erik\Documents\Visual Studio 2022\Projects\Glaucon4\Glaucon4Test\Out\",
         InputPath = @"E:\Users\erik\Documents\Visual Studio 2022\Projects\Glaucon4\Glaucon4Test\Resources\"
     };
     public Glaucon CreateGlaucon()
     {
+        
         return new Glaucon
         {
             Title = "Example A: linear static analysis of a 2D truss with support settlement (kips,in) ",

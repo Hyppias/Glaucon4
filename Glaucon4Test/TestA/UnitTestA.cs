@@ -1,4 +1,5 @@
 ﻿using MathNet.Numerics;
+using System.Reflection;
 using Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
@@ -10,15 +11,16 @@ namespace UnitTestGlaucon
         [Test]
         public void TestA()
         {
-            Glaucon = CreateGlaucon(); // build test case
+            Glaucon = CreateGlaucon();
             Glaucon.ProcessGlaucon(Param);
+            Glaucon.BaseFile = MethodBase.GetCurrentMethod().Name;
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);
             Assert.That(result == 0, $"Error computing {Param.InputFileName}");
             Assert.That(Glaucon.Nodes.Count == 12, $"{Param.InputFileName} # nodes");
             Assert.That(Glaucon.Members.Count == 21, $"{Param.InputFileName} # members");
-            Assert.That(Glaucon.NodeRestraints.Count == 12, $"{Param.InputFileName} # nodes with Reactions");
+            Assert.That(Glaucon.NodesRestraints.Count == 12, $"{Param.InputFileName} # nodes with Reactions");
             Assert.That(Glaucon.LoadCases.Count == 2, $"{Param.InputFileName} # load cases");
             Assert.That(Glaucon.AnimatedModes.Length == 0, $"{Param.InputFileName} # dynamic modes");
 

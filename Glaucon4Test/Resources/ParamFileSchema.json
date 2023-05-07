@@ -9,22 +9,62 @@
       "$schema": "http://json-schema.org/draft-04/schema#",
       "type": "object",
       "properties": {
+        "LogFilename": {
+          "type": "string"
+        },
+        "KeepLog": {
+          "type": "boolean",
+          "default": false
+        },
+        "PanRate": {
+          "type": "number",
+          "default": 1.0
+        },
         "StrainLimit": {
           "type": "number"
         },
         "EquilibriumTolerance": {
-          "type": "number"
+          "type": "number",
+          "default": 0.000001
         },
         "EquilibriumError": {
           "type": "number"
         },
+        "Scale": {
+          "type": "number",
+          "default": 1.0
+        },
+        "Shift": {
+          "type": "number",
+          "default": 1.0
+        },
+        "AccountForGeomStability": {
+          "type": "boolean",
+          "default": true
+        },
+        "QLoadsLocal": {
+          "type": "boolean",
+          "default": false
+        },
+        "AccountForShear": {
+          "type": "boolean",
+          "default": false
+        },
+        "LumpedMassMatrix": {
+          "type": "boolean",
+          "default": true
+        },
         "MinEigenvalue": {
-          "type": "number"
+          "type": "number",
+          "default": 0.0
         },
         "MaxEigenvalue": {
           "type": "number"
         },
         "ModalConvergenceTol": {
+          "type": "number"
+        },
+        "Tolerance": {
           "type": "number"
         },
         "ResidualTolerance": {
@@ -34,52 +74,71 @@
           "type": "number"
         },
         "Analyze": {
-          "type": "boolean"
-        },
-        "DoModal": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "Validate": {
-          "type": "boolean"
+          "type": "boolean",
+          "default": true
         },
         "UnifLoadsLocal": {
-          "type": "number"
+          "type": "boolean",
+          "default": true
         },
         "OutputFormat": {
           "type": "string"
         },
         "RenumNodes": {
-          "type": "integer"
+          "type": "boolean",
+          "default": false
         },
         "MaxSegmentCount": {
           "type": "integer"
         },
         "AxialStrainWarning": {
-          "type": "integer"
+          "type": "boolean",
+          "default": true
         },
         "MinimumIterations": {
-          "type": "integer"
+          "type": "integer",
+          "default": 1
         },
         "MaximumIterations": {
+          "type": "integer",
+          "default": 20
+        },
+        "CondensationMethod": {
           "type": "integer"
         },
-        "FrequenciesFound": {
-          "type": "integer"
+        "DeformationExaggeration": {
+          "type": "number",
+          "default": 1.0
         },
-        "LoopCount": {
-          "type": "integer"
+        "ModalExaggeration": {
+          "type": "number",
+          "default": 1.0
         },
-        "Iterations": {
-          "type": "integer"
+        "XIncrement": {
+          "type": "number",
+          "default": 10
         },
         "Decimals": {
-          "type": "integer"
+          "type": "integer",
+          "default": 2
+        },
+        "Title": {
+          "type": "string"
         },
         "ModalMethod": {
-          "type": "integer"
+          "type": "integer",
+          "oneof": [ 0, 1, 2,3,4,5,6,7 ]
         },
+
         "InputPath": {
           "type": "string"
+        },
+        "InputSource": {
+          "type": "integer"
         },
         "OutputPath": {
           "type": "string"
@@ -92,24 +151,20 @@
         "StrainLimit",
         "EquilibriumTolerance",
         "EquilibriumError",
-        "MinEigenvalue",
-        "MaxEigenvalue",
-        "ModalConvergenceTol",
+        //"MinEigenvalue",
+        //"MaxEigenvalue",
+        //"ModalConvergenceTol",
         "ResidualTolerance",
-        "MaxVibrationTime",
+        //"MaxVibrationTime",
         "Analyze",
-        "DoModal",
         "Validate",
         "UnifLoadsLocal",
         "OutputFormat",
-        "RenumNodes",
+        //"RenumNodes",
         "MaxSegmentCount",
         "AxialStrainWarning",
         "MinimumIterations",
         "MaximumIterations",
-        "FrequenciesFound",
-        "LoopCount",
-        "Iterations",
         "Decimals",
         "ModalMethod",
         "InputPath",

@@ -36,7 +36,7 @@ namespace UnitTestGlaucon
             Decimals = 2,
             ModalMethod = 1,
             Scale = 1.0,
-            ConsistentMassMatrix = true,
+           
             LumpedMassMatrix = true,
             DynamicModesCount = 14,
             PanRate = 2.0,

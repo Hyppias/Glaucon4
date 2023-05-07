@@ -62,7 +62,7 @@ namespace Terwiel.Glaucon
         /// <param name="members">list of members</param>
         /// <param name="rearrange">Rearrange the matrix?</param>
         /// <param name="Q">List of compressive forces for each member</param>
-        public static void AssembleSystemStiffnessMatrix(List<Member> members, bool rearrange = ReArrange, DenseMatrix Q = null, bool geom = false)
+        public static void AssembleSystemStiffnessMatrix(List<Member> members, bool rearrange = ReArrange, DenseMatrix Q = null)
         {
             //StartClock(4);
             K.Clear();
@@ -70,7 +70,7 @@ namespace Terwiel.Glaucon
             foreach (var mbr in members)
             {
                 mbr.Elastic_K();
-                if (geom && Q != null)
+                if (Param.AccountForGeomStability && Q != null)
                 // Q = axial force, eg. due to temperature change
                 // Przemieniecki chapter 15, page 384, (15.1)
                 {

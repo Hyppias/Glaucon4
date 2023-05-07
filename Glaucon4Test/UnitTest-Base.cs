@@ -9,7 +9,6 @@ using Terwiel.Glaucon;
 
 namespace UnitTestGlaucon
 {
-
     public class UnitTestBase
     {
         public const string pathName = @"E:\Users\erik\Documents\Visual Studio 2022\Projects\Glaucon4\Glaucon4Test\Resources\";
@@ -38,7 +37,7 @@ namespace UnitTestGlaucon
             var nf = culture.NumberFormat.NumberDecimalSeparator;
             Assert.IsTrue(nf.Equals("."), "Error: Culture's decimal separator must be '.'");
             //bw = new BinaryWriter(ms = new MemoryStream());
-
+            
             Debug.WriteLine("Exit " + MethodBase.GetCurrentMethod().Name);
         }
         // Use TestInitialize to run code before running each test 

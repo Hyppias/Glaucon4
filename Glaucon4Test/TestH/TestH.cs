@@ -26,7 +26,7 @@ namespace UnitTestGlaucon
 
             Assert.That(295 ==  Glaucon.Members.Count, $"{Param.InputFileName} Nr of members");
             Assert.That(148 ==  Glaucon.Nodes.Count, $"{Param.InputFileName} Nr of nodes");
-            Assert.That(36 ==  Glaucon.NodeRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
+            Assert.That(36 ==  Glaucon.NodesRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
             Assert.That(1 ==  Glaucon.LoadCases.Count, $"{Param.InputFileName} Nr of load cases ");
             Assert.That(0 ==  Glaucon.LoadCases[0].NodalLoads.Count, $"{Param.InputFileName} # loaded nodes");
             Assert.That(166 ==  Glaucon.LoadCases[0].UniformLoads.Count, $"{Param.InputFileName} # uniform loads");

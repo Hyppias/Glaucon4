@@ -12,7 +12,7 @@
 
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-
+using System.Reflection;
 using MathNet.Numerics.LinearAlgebra.Double;
 
 namespace Terwiel.Glaucon
@@ -228,7 +228,7 @@ namespace Terwiel.Glaucon
                         var mbr = mbrs[n = uLoad.MemberNr];
                         fixedEndForces = uLoad.GetLoadVector(mbr);
 #if false
-                        var effLength = mbr.Le;                       
+                        var effLength = mbr.L_eff;                       
 
                         // First in local member coordinates:
                         fixedEndForces[0] = fixedEndForces[6] = uLoad.Q[0] * effLength / 2.0;
@@ -390,47 +390,57 @@ namespace Terwiel.Glaucon
                     //hasMechLoads |= PrescrDisplacements.Count > 0;
                 }
             }           
-
-            /* See Logan, pg. 37, formula 2.5.1 or
+            /*
+            System matix partitioning:
+            See Logan, pg. 37, formula 2.5.1 or
             See McGuire pg 41, formula 3.7
             Kff: upper left
             Kss lower right
             Ksf: lower left
             Kfs : upper right  
-           
+            
             But only after permutation!
-            Readony props! */
-            private static DenseMatrix Kff => (DenseMatrix)SSM.SubMatrix(0, matrixPart, 0, matrixPart);
 
-            private static DenseMatrix Kfs => (DenseMatrix)SSM.SubMatrix(0, matrixPart, matrixPart, DoF - matrixPart);
+            the indices f are for the unrestrained DoFs
+            the indices s denote the support (restrained DoFs
+            So we need to solve [Pf] = [Kff] * [Df] to get the unknown displacements Df.
+            The support reaction follow from [Ksf]:
+            [Ps] = [Ksf] * [Df] => [Ksf] * [Kff]^-1 * [Pf]
 
-            // DenseMatrix Kss => (DenseMatrix) SSM.SubMatrix(matrixPart, DoF - matrixPart, matrixPart, DoF - matrixPart);
-            private static DenseMatrix Ksf => (DenseMatrix)SSM.SubMatrix(matrixPart, DoF - matrixPart, 0, matrixPart);
+            So SSM has the permutated system stiffness matrix:
+            */
+            private static DenseMatrix Kff => (DenseMatrix)SSM.SubMatrix(0, FreePart, 0, FreePart);
 
-            private DenseMatrix Displacements1 => (DenseMatrix)Displacements.SubMatrix(0, matrixPart, 0, 1);
+            private static DenseMatrix Kfs => (DenseMatrix)SSM.SubMatrix(0, FreePart, FreePart, DoF - FreePart);
+
+            // We don't wat the part Kss:
+            // DenseMatrix Kss => (DenseMatrix) SSM.SubMatrix(FreePart, DoF - FreePart, FreePart, DoF - FreePart);
+            private static DenseMatrix Ksf => (DenseMatrix)SSM.SubMatrix(FreePart, DoF - FreePart, 0, FreePart);
+
+            private DenseMatrix Displacements1 => (DenseMatrix)Displacements.SubMatrix(0, FreePart, 0, 1);
 
             private DenseMatrix Displacements2 =>
-                (DenseMatrix)Displacements.SubMatrix(matrixPart, DoF - matrixPart, 0, 1);
+                (DenseMatrix)Displacements.SubMatrix(FreePart, DoF - FreePart, 0, 1);
 
-            private DenseMatrix F_mech1 => (DenseMatrix)MechForces.SubMatrix(0, matrixPart, 0, 1);
+            private DenseMatrix F_mech1 => (DenseMatrix)MechForces.SubMatrix(0, FreePart, 0, 1);
 
-            private DenseMatrix F_mech2 => (DenseMatrix)MechForces.SubMatrix(matrixPart, DoF - matrixPart, 0, 1);
+            private DenseMatrix F_mech2 => (DenseMatrix)MechForces.SubMatrix(FreePart, DoF - FreePart, 0, 1);
 
-            private DenseMatrix F_temp1 => (DenseMatrix)TempForces.SubMatrix(0, matrixPart, 0, 1);
+            private DenseMatrix F_temp1 => (DenseMatrix)TempForces.SubMatrix(0, FreePart, 0, 1);
 
-            private DenseMatrix Ff => (DenseMatrix)F.SubMatrix(0, matrixPart, 0, 1);
+            private DenseMatrix Ff => (DenseMatrix)F.SubMatrix(0, FreePart, 0, 1);
 
-            private DenseMatrix Fs => (DenseMatrix)F.SubMatrix(matrixPart, DoF - matrixPart, 0, 1);
-
-            /// <summary>
-            /// Gets the partial vector of the prescribed displacements.
-            /// </summary>
-            private DenseMatrix PDf => (DenseMatrix)PrescrDispl.SubMatrix(0, matrixPart, 0, 1);
+            private DenseMatrix Fs => (DenseMatrix)F.SubMatrix(FreePart, DoF - FreePart, 0, 1);
 
             /// <summary>
             /// Gets the partial vector of the prescribed displacements.
             /// </summary>
-            private DenseMatrix PDs => (DenseMatrix)PrescrDispl.SubMatrix(matrixPart, DoF - matrixPart, 0, 1);
+            private DenseMatrix PDf => (DenseMatrix)PrescrDispl.SubMatrix(0, FreePart, 0, 1);
+
+            /// <summary>
+            /// Gets the partial vector of the prescribed displacements.
+            /// </summary>
+            private DenseMatrix PDs => (DenseMatrix)PrescrDispl.SubMatrix(FreePart, DoF - FreePart, 0, 1);
 
             /// <summary>
             /// Solve the matrix equation with MatNet.
@@ -464,15 +474,16 @@ namespace Terwiel.Glaucon
 
             public void Solve(List<Member> Members)
             {
+                Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
                 Contract.Requires(Members != null);
                 Displacements = new DenseMatrix(DoF, 1); // displacments of all nodes
-                Reactions = new DenseMatrix(DoF - matrixPart, 1); // reaction forces			
+                Reactions = new DenseMatrix(DoF - FreePart, 1); // reaction forces			
 
-                var dReaction = new DenseMatrix(DoF - matrixPart, 1); // incremental reaction forces	
-                var delta_f = new DenseMatrix(matrixPart, 1); // incremental displ. of all free DoFs		
+                var dReaction = new DenseMatrix(DoF - FreePart, 1); // incremental reaction forces	
+                var delta_f = new DenseMatrix(FreePart, 1); // incremental displ. of all free DoFs		
 
                 // global system stiffness matrix  [SSM({D}^(i))], {D}^(0)={0} (i=0) 
-                AssembleSystemStiffnessMatrix(Members); // is permuted now. No geom yet
+                AssembleSystemStiffnessMatrix(Members); // is permuted now. No geometric stability yet
 #if DEBUG
 
                 // keep for testing
@@ -481,10 +492,10 @@ namespace Terwiel.Glaucon
 #endif
 
                 // Glaucon.WriteMatrix($"lc_{Nr + 1}_", "Ku.mat", "Ku",  SSM);
-                MechForces.PermuteRows(perm);
-                TempForces.PermuteRows(perm);
+                MechForces.PermuteRows(Perm);
+                TempForces.PermuteRows(Perm);
 
-                // Displacements.PermuteRows(Glaucon.perm);
+                // Displacements.PermuteRows(Glaucon.Perm);
                 // First apply temperature "forces".
                 if (TempLoads?.Count > 0)
                 {
@@ -492,7 +503,7 @@ namespace Terwiel.Glaucon
                     // solve {F_t} = [SSM({D=0})] *{D_t}
                     SolveIt(Kff, F_temp1).CopyTo(delta_f);
 
-                    Displacements.SetSubMatrix(0, matrixPart, 0, 1, delta_f);
+                    Displacements.SetSubMatrix(0, FreePart, 0, 1, delta_f);
 
                     // See McGuire pg 41, form 3.8.b
                     dReaction = Ksf * delta_f;
@@ -521,9 +532,9 @@ namespace Terwiel.Glaucon
                     // and Rao, pg 212, formula 6.15
                     if (PrescrDispl?.RowCount > 0)
                     {
-                        PrescrDispl.PermuteRows(perm);
+                        PrescrDispl.PermuteRows(Perm);
                         var F_ = Kfs * PDs;
-                        MechForces.SetSubMatrix(0, matrixPart, 0, 1, F_mech1 - F_);
+                        MechForces.SetSubMatrix(0, FreePart, 0, 1, F_mech1 - F_);
                     }
 
                     WriteMatrix(MEMBER, $"LC_{Nr}_", "Kfs.mat", "Kfs", Kfs);
@@ -535,13 +546,13 @@ namespace Terwiel.Glaucon
                     // combine {D} = {D_t} + {D_m}	
                     Displacements.SetSubMatrix(
                         0,
-                        matrixPart,
+                        FreePart,
                         0,
                         1,
                         Displacements1 + delta_f); // permuted displacement vector 
                     if (PrescrDispl != null)
                         // PDs would throw a null reference exception if tere are no prescribed displacements:
-                        Displacements.SetSubMatrix(matrixPart, DoF - matrixPart,
+                        Displacements.SetSubMatrix(FreePart, DoF - FreePart,
                             0, 1, PDs);
 
                     dReaction = Ksf * Displacements1 - F_mech2; // OK
@@ -555,7 +566,7 @@ namespace Terwiel.Glaucon
                 // mechanical plus temperature loads displacements {D}	
                 MembersEndForces(Members);
 
-                var dF = new DenseMatrix(matrixPart, 1);
+                var dF = new DenseMatrix(FreePart, 1);
 
                 // check the equilibrium error	
                 error = EquilibriumError(ref dF);
@@ -586,7 +597,7 @@ namespace Terwiel.Glaucon
                         SolveIt(Kff, dF).CopyTo(delta_f);
 
                         // increment {D}^(i+1) = {D}^(i) + {dD}^(i)	
-                        Displacements.SetSubMatrix(0, matrixPart, 0, 1, Displacements1 + delta_f);
+                        Displacements.SetSubMatrix(0, FreePart, 0, 1, Displacements1 + delta_f);
 
                         // member forces {Q} for displacements after i-th iteration:      
                         MembersEndForces(Members);
@@ -596,10 +607,10 @@ namespace Terwiel.Glaucon
                 }
 
                 Reactions = -Fs + Ksf * Displacements1;
-                Displacements.PermuteRows(perm.Inverse());
+                Displacements.PermuteRows(Perm.Inverse());
 
-                // Displacements.PermuteRows(Glaucon.perm.Inverse());
-                MechForces.PermuteRows(perm.Inverse());
+                // Displacements.PermuteRows(Glaucon.Perm.Inverse());
+                MechForces.PermuteRows(Perm.Inverse());
 
                 WriteMatrix(MEMBER, $"lc_{Nr + 1}_", "mechForces.mat", "F", MechForces);
 
@@ -617,6 +628,7 @@ namespace Terwiel.Glaucon
                     }
                 }
                 GetPeakForces(Members, (DenseVector)Displacements.Column(Nr));
+                Debug.WriteLine("Exit " + MethodBase.GetCurrentMethod().Name);
             }
 
             /// <summary>
@@ -644,7 +656,7 @@ namespace Terwiel.Glaucon
             {                
                 var d = new DenseMatrix(DoF, 1);
                 Displacements.CopyTo(d);
-                d.PermuteRows(perm.Inverse());
+                d.PermuteRows(Perm.Inverse());
                 var dGlobal = new DenseVector(12);
 
                 // Parallel.ForEach(mbrs, mbr =>

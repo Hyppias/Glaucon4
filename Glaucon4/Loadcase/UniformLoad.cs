@@ -46,7 +46,7 @@ namespace Terwiel.Glaucon
                 {
                     var fixedEndForces = new DenseVector(12);
                     //var mbr = mbrs[n = uLoad.MemberNr];
-                    var effLength = mbr.Le;
+                    var effLength = mbr.L_eff;
 
                     // First in local member coordinates:
                     fixedEndForces[0] = fixedEndForces[6] = Q[0] * effLength / 2.0;

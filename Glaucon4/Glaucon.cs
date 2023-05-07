@@ -47,12 +47,14 @@ namespace Terwiel.Glaucon
 
             try
             {
-                InitStaticMesh(); // general plot data and undeformed mesh
-                                  // everything is read, start calculation:
+                 // general plot data and undeformed mesh
+                InitStaticMesh();
+                // everything is ready, start calculation:
                 if (Param.Analyze)
                 {
                     K = new DenseMatrix(DoF); // global stiffness matrix
-
+                    SSM = new DenseMatrix(DoF);
+                    
                     foreach (var ldc in LoadCases)
                     {
                         ldc.Solve(Members);
@@ -69,6 +71,7 @@ namespace Terwiel.Glaucon
 
                     if (Param.ModalMethod != None)
                     {
+                        SMM = new DenseMatrix(DoF);
                         // K was set up during load case processing:
                         K.PermuteColumns(Perm.Inverse());
                         K.PermuteRows(Perm.Inverse());
@@ -210,9 +213,6 @@ namespace Terwiel.Glaucon
         private static string prefix;
 
 #endif
-
-
-
         /// <summary>
         /// the System stiffness matrix
         /// </summary>
@@ -227,13 +227,12 @@ namespace Terwiel.Glaucon
         /// <summary>
         /// for rearranging the stiffness, displacements and forces matrices:
         /// </summary>
-
-        private static Permutation perm;
+        public static Permutation Perm;
 
         /// <summary>
         /// reaction data, total no. of restraints , partition of matrices
         /// </summary>
-        private static int matrixPart;
+        public static int FreePart;
 
         /// <summary>
         /// The number of degrees of freedom of the construction.
@@ -266,6 +265,7 @@ namespace Terwiel.Glaucon
         /// Gets or sets the eigenfrequencies
         /// </summary>
         private DenseVector frequencies;
+        private int[] GlobalRestraints;
 
         #endregion
 
@@ -310,16 +310,9 @@ namespace Terwiel.Glaucon
             // to avoid FP equal comparisons.
             // So: less than 0: no min/max
             // positive including 0 do min/max
-            deltaX = -1, Shift; // shift-factor for rigid-body-modes
-
-        // for rearranging the stiffness, displacements and forces matrices:
-        public static Permutation Perm;
-
-        /// <summary>
-        /// reaction data, total no. of restraints , partition of matrices
-        /// </summary>
-        //private static int matrixPart;
-
+            //deltaX = -1, 
+            Shift; // shift-factor for rigid-body-modes
+        
         public static int
             //BandWidth,
             MinRestraints, // nr of restrained DOFs
@@ -335,19 +328,11 @@ namespace Terwiel.Glaucon
         [Description("mode number to animate")]
         public int[] AnimationModes { get; set; }
 
-        //[XmlAttribute("Pan"), JsonProperty("Pan")]
-        //[Description("pan rate during animation")]
-        //public double Pan { get; set; }
-
-        [JsonProperty("Dx")]
-        [Description("Dx")]
-        public int DeltaX { get; set; }
+        //[JsonProperty("Dx")]
+        //[Description("Dx")]
+        //public int DeltaX { get; set; }
 
         public int ModalMethod = ALL;
-
-        //[XmlAttribute("CondModesCnt"), JsonIgnore]
-        //[Description("number of condensed nodes")]
-        //public int nC { get; set; } // number of condensed nodes
 
         [XmlAttribute("Dimensionality"), JsonIgnore]
         [Description("dimensions of the construction: X, Y, Z")]
@@ -373,21 +358,21 @@ namespace Terwiel.Glaucon
         [Description("list of structure members")]
         public List<Member> Members { get; set; }
 
-        [XmlArray("NodeRestraints")]
-        [JsonProperty("NodeRestraints")]
-        [XmlArrayItem("NodeRestraint")]
-        [Description("list of NodeRestraints")]
-        public List<NodeRestraint> NodeRestraints { get; set; }
+        [XmlArray("NodesRestraints")]
+        [JsonProperty("NodesRestraints")]
+        [XmlArrayItem("NodesRestraint")]
+        [Description("list of node restraints")]
+        public List<NodeRestraint> NodesRestraints { get; set; }
 
-        [XmlArray("NodeToCondense")]
-        [JsonProperty("NodeToCondense")]
+        [XmlArray("NodesToCondense")]
+        [JsonProperty("NodesToCondense")]
         [XmlArrayItem("NodeToCondense")]
         [Description("list of nodes to condense")]
         public List<CondensedNode> NodesToCondense { get; set; }
 
-        public List<NodeRestraint> NodesRestraints;
+       //  public List<NodeRestraint> NodesRestraints;
 
-        public int[] GlobalRestraints;
+        
 
         #endregion
 
@@ -435,8 +420,8 @@ namespace Terwiel.Glaucon
             }
             else
             { // InputSource = JSON
-
-                BaseFile = Path.GetFileNameWithoutExtension(Param.InputFileName);
+                
+                //BaseFile = Path.GetFileNameWithoutExtension(Param.InputFileName);
                 if (!Directory.Exists(Param.InputPath))
                 {
                     throw new DirectoryNotFoundException($"{Param.InputPath} does not exist");
@@ -499,6 +484,7 @@ namespace Terwiel.Glaucon
                 mbr.NodeB = Nodes[mbr.nB];
 
                 SeqCheck(mbr.Nr, "Member");
+                mbr.Process(Nodes);
             }
             NodesRestraints.Sort((i, j) => i.NodeNr.CompareTo(j.NodeNr));
             foreach (var nr in NodesRestraints)
@@ -525,50 +511,15 @@ namespace Terwiel.Glaucon
 
             DoF = Nodes.Count * 6;// total number of degrees of freedom ( 6 per node)
             Lg($"{DoF} dregrees of freedom.");
+            
+            Lg($"{NodesRestraints.Count} restrained nodes with one or more restrained DoFs.");
 
-            //SupportedNodesCount = NodeRestraints.Count; // Nr of restrained nodes
-            Lg($"{NodeRestraints.Count} restrained nodes.");
-            // now set up the DoF vector:
-            matrixPart = DoF;
-            GlobalRestraints = new int[DoF];
-            // NodeRestraints is a list of only restrained nodes
-            foreach (var nr in NodesRestraints)
-            {
-                var nodeNr = nr.NodeNr;
-                var restr = nr.Restraints; // int[6]
-                for (var j = 0; j < 6; j++)
-                {
-                    // read restraints: 0 = not restrained (free), other value = fixed = false.
-                    var n = restr[j];
-                    // Restraints is  int[DoF]
-                    GlobalRestraints[(nodeNr * 6) + j] = n;
-                    // one of the 6 degrees of freedon of the construction may not be
-                    // unconstrained:
-                    matrixPart -= n;
-                }
-            }
+            int[] index = PartitionSystemMatrices();
+            
+            // the lower part of this array comprise the free-to-move DoFs,
+            // corresponding to the Kff partition in McGuire, formula 3.7 page 43 
 
-            // partition stiffness matrix / force vector:
-            // index[i] says where a vector element or matrix row/column should go when permuting.
-            var index = new int[DoF]; // use for Permutation
-            var j1 = 0;
-            var j2 = DoF - matrixPart;
-            for (var i = 0; i < DoF; i++)
-            {
-                if (GlobalRestraints[i] == 1)
-                {
-                    index[j1] = i;
-                    j1++;
-                }
-                else
-                {
-                    index[j2] = i;
-                    j2++;
-                }
-                //index[i] = GlobalRestraints[i] == 1 ? j1++ : j2++;
-            }
-            //TODO: check this!
-            perm = new Permutation(index);
+            Perm = new Permutation(index);
 
             Lg($"{Members.Count} members.");
 
@@ -663,6 +614,51 @@ namespace Terwiel.Glaucon
             s.Stop();
             Debug.WriteLine($"Elapsed computing time for processing input: {s.ElapsedMilliseconds} msec.");
 #endif
+        }
+
+        public int[] PartitionSystemMatrices()
+        {
+             // now set up the DoF vector:
+            FreePart = DoF;
+            GlobalRestraints = new int[DoF];
+            // NodeRestraints is a list of only restrained nodes
+            foreach (var nr in NodesRestraints)
+            {
+                var nodeNr = nr.NodeNr;
+                var restr = nr.Restraints; // int[6]
+                for (var j = 0; j < 6; j++)
+                {
+                    // read restraints: 0 = not restrained (free), other value = fixed = false.
+                    var n = restr[j];
+                    // Restraints is  int[DoF]
+                    GlobalRestraints[(nodeNr * 6) + j] = n;
+                    // one of the 6 degrees of freedon of the construction may not be
+                    // unconstrained:
+                    FreePart -= n;
+                }
+            }
+
+            // partition stiffness matrix / force vector:
+            // index[i] says where a vector element or matrix row/column should goes when permuting.
+            var index = new int[DoF]; // use for Permutation
+            var j1 = 0;
+            var j2 = FreePart;
+            for (var i = 0; i < DoF; i++)
+            {
+                index[GlobalRestraints[i] == 0 ? j1++ : j2++ ] = i;
+                //if (GlobalRestraints[i] == 0)
+                //{
+                //    index[j1] = i;
+                //    j1++;
+                //}
+                //else
+                //{
+                //    index[j2] = i;
+                //    j2++;
+                //}
+            }
+            return index;
+            //TODO: check this!
         }
     }
     #endregion Methods

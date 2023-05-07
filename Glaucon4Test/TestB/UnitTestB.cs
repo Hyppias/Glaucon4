@@ -16,7 +16,7 @@ namespace UnitTestGlaucon
     [TestFixture]
     public partial class UnitTestB : UnitTestBase
     {
-         public DenseMatrix? deflection , Reactions, EndForces;
+        public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestB()
         {
@@ -27,7 +27,7 @@ namespace UnitTestGlaucon
             Assert.That(0== result, $"{Param.InputFileName} Exit code Glaucon");
             Assert.That(4== Glaucon.Members.Count, $"{Param.InputFileName} Nr of members");
             Assert.That(5== Glaucon.Nodes.Count, $"{Param.InputFileName} Nr of nodes");
-            Assert.That(4== Glaucon.NodeRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
+            Assert.That(4== Glaucon.NodesRestraints.Count, $"{Param.InputFileName} Nr of restrained nodes");
             Assert.That(3== Glaucon.LoadCases.Count, $"{Param.InputFileName} Nr of load cases");
 
             for (var i = 0; i < Glaucon.LoadCases.Count; i++)

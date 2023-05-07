@@ -21,12 +21,14 @@ namespace Terwiel.Glaucon
 
     public partial class Glaucon
     {
+        // Modal methods:
         const int RANGE = 3;
-        const int SUBSPACE = 1;
-        const int STODOLA = 2;
+        const int SUBSPACE = 1; // =SubSpace Jacobi
+        const int STODOLA = 2; // = Gavin
         const int ALL = 4;
-        const int MKL = 5;
-        const int FEAST = 6;
+        const int MKL = 5; // Use MKL library (= real big)
+        const int FEAST = 6; 
+        const int EVG = 7; // = MathNet
 
         const int OBJECT = 1;
         const int JSON = 0;

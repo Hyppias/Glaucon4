@@ -45,9 +45,9 @@ namespace Terwiel.Glaucon
             [Description("Three member inertias, perpendicular to the YZ plane")]
             public DenseVector Iz { get;set; }
 
-            [XmlAttribute("EffLength"), JsonProperty(nameof(Le))]
+            [XmlAttribute("EffLength"), JsonProperty(nameof(L_eff))]
             [Description("Effective length (due to node size)")]
-            public double Le { get;set; }
+            public double L_eff { get;set; }
 
             [XmlVector("As"), JsonProperty(nameof(As))]
             [Description("Cross section area components")]
@@ -128,6 +128,7 @@ namespace Terwiel.Glaucon
                 //Mat.E = material[0];
                 Roll = roll;
                 Active = true; // members may never be made inactive.
+                
             }
 
             public bool Active;
@@ -136,15 +137,15 @@ namespace Terwiel.Glaucon
             /// </summary>
             /// <param name="n">member number base 0</param>
             /// <param name="nodes">the nodes list</param>
-            public void Process(int n, Node[] nodes) // n is base 0
+            public void Process(List<Node> nodes) // n is base 0
             {
 #if DEBUG
-                Prefix = $"mb_{n + 1}_";
+                Prefix = $"mb_{Nr + 1}_";
 #endif
-                Nr = n;
+                //Nr = n;
                 k = new DenseMatrix(12); //  may include the geometric part
                 Gamma = new DenseMatrix(12);
-                ind = new int[12];
+                ind = new int[12];                
 
                 NodeA.Active = NodeB.Active = true; // to check if all nodes are relevant
 
@@ -164,8 +165,9 @@ namespace Terwiel.Glaucon
                 );
                 // for ForceBentBeam() (original: nx)
                 XIncrementCount = (int) Math.Floor(Length / Param.XIncrement); 
-                Le = Length - NodeA.NodeRadius - NodeB.NodeRadius;
-                if (Le < 0)
+                // Effective length: minus the node radius:
+                L_eff = Length - NodeA.NodeRadius - NodeB.NodeRadius;
+                if (L_eff < 0)
                 {
                     throw new ArgumentOutOfRangeException($"Node radii too large for member {Nr + 1}.");
                 }
@@ -183,8 +185,8 @@ namespace Terwiel.Glaucon
             {
                 if (shear)
                 {
-                    Ksy = 12.0 * Mat.E * Iz[2] / (Mat.G * As[1] * Le * Le); // Φy: Przemieniecki formula 5.117
-                    Ksz = 12.0 * Mat.E * Iz[1] / (Mat.G * As[2] * Le * Le); // Φz: Przemieniecki formula 5.118
+                    Ksy = 12.0 * Mat.E * Iz[2] / (Mat.G * As[1] * L_eff * L_eff); // Φy: Przemieniecki formula 5.117
+                    Ksz = 12.0 * Mat.E * Iz[1] / (Mat.G * As[2] * L_eff * L_eff); // Φz: Przemieniecki formula 5.118
                     Dsy = Sq(1.0d + Ksy);
                     Dsz = Sq(1.0d + Ksz);
                 }
@@ -198,37 +200,37 @@ namespace Terwiel.Glaucon
             }
 
             /// <summary>
-            /// space frame elastic stiffness matrix in global coordnates
+            /// space frame elastic stiffness matrix in global coordinates
             /// </summary>
             public void Elastic_K()
             {
                 k.Clear();
                 // first the local stiffness matrix:
-                k[6, 0] = k[0, 6] = -(k[0, 0] = k[6, 6] = Mat.E * As[0] / Le);
-                //k[1, 1] = k[7, 7] = 12.0 * E * Iz[2] / (Le * Le * Le * (1.0 + Ksy));
-                //k[2, 2] = k[8, 8] = 12.0 * E * Iz[1] / (Le * Le * Le * (1.0 + Ksz));
-                //k[3, 3] = k[9, 9] = G * Iz[0] / Le;
-                k[4, 4] = k[10, 10] = (4.0 + Ksz) * Mat.E * Iz[1] / (Le * (1.0 + Ksz));
-                k[5, 5] = k[11, 11] = (4.0 + Ksy) * Mat.E * Iz[2] / (Le * (1.0 + Ksy));
+                k[6, 0] = k[0, 6] = -(k[0, 0] = k[6, 6] = Mat.E * As[0] / L_eff);
+                //k[1, 1] = k[7, 7] = 12.0 * E * Iz[2] / (L_eff * L_eff * L_eff * (1.0 + Ksy));
+                //k[2, 2] = k[8, 8] = 12.0 * E * Iz[1] / (L_eff * L_eff * L_eff * (1.0 + Ksz));
+                //k[3, 3] = k[9, 9] = G * Iz[0] / L_eff;
+                k[4, 4] = k[10, 10] = (4.0 + Ksz) * Mat.E * Iz[1] / (L_eff * (1.0 + Ksz));
+                k[5, 5] = k[11, 11] = (4.0 + Ksy) * Mat.E * Iz[2] / (L_eff * (1.0 + Ksy));
 
-                // k[4, 2] = k[2, 4] = -6.0 * E * Iz[1] / (Le * Le * (1.0 + Ksz));
-                // k[5, 1] = k[1, 5] =  6.0 * E * Iz[2] / (Le * Le * (1.0 + Ksy));
+                // k[4, 2] = k[2, 4] = -6.0 * E * Iz[1] / (L_eff * L_eff * (1.0 + Ksz));
+                // k[5, 1] = k[1, 5] =  6.0 * E * Iz[2] / (L_eff * L_eff * (1.0 + Ksy));
                 //k[6, 0] = k[0, 6] = -k[0, 0];
 
                 k[11, 7] = k[7, 11] = k[7, 5] = k[5, 7] = -(
-                    k[11, 1] = k[1, 11] = k[5, 1] = k[1, 5] = 6.0 * Mat.E * Iz[2] / (Le * Le * (1.0 + Ksy))
+                    k[11, 1] = k[1, 11] = k[5, 1] = k[1, 5] = 6.0 * Mat.E * Iz[2] / (L_eff * L_eff * (1.0 + Ksy))
                 );
                 k[10, 8] = k[8, 10] = k[8, 4] = k[4, 8] = -(
-                    k[10, 2] = k[2, 10] = k[4, 2] = k[2, 4] = -6.0 * Mat.E * Iz[1] / (Le * Le * (1.0 + Ksz))
+                    k[10, 2] = k[2, 10] = k[4, 2] = k[2, 4] = -6.0 * Mat.E * Iz[1] / (L_eff * L_eff * (1.0 + Ksz))
                 );
-                k[9, 3] = k[3, 9] = -(k[3, 3] = k[9, 9] = Mat.G * Iz[0] / Le);
+                k[9, 3] = k[3, 9] = -(k[3, 3] = k[9, 9] = Mat.G * Iz[0] / L_eff);
                 //k[10, 2] = k[2, 10] = k[4, 2];
                 // k[11, 1] = k[1, 11] = k[5, 1];
 
-                k[7, 1] = k[1, 7] = -(k[1, 1] = k[7, 7] = 12.0 * Mat.E * Iz[2] / (Le * Le * Le * (1.0 + Ksy)));
-                k[8, 2] = k[2, 8] = -(k[2, 2] = k[8, 8] = 12.0 * Mat.E * Iz[1] / (Le * Le * Le * (1.0 + Ksz)));
-                k[10, 4] = k[4, 10] = (2.0 - Ksz) * Mat.E * Iz[1] / (Le * (1.0 + Ksz));
-                k[11, 5] = k[5, 11] = (2.0 - Ksy) * Mat.E * Iz[2] / (Le * (1.0 + Ksy));
+                k[7, 1] = k[1, 7] = -(k[1, 1] = k[7, 7] = 12.0 * Mat.E * Iz[2] / (L_eff * L_eff * L_eff * (1.0 + Ksy)));
+                k[8, 2] = k[2, 8] = -(k[2, 2] = k[8, 8] = 12.0 * Mat.E * Iz[1] / (L_eff * L_eff * L_eff * (1.0 + Ksz)));
+                k[10, 4] = k[4, 10] = (2.0 - Ksz) * Mat.E * Iz[1] / (L_eff * (1.0 + Ksz));
+                k[11, 5] = k[5, 11] = (2.0 - Ksy) * Mat.E * Iz[2] / (L_eff * (1.0 + Ksy));
 
                 // See McGuire, pg 98, formula 5.16
                 k = (DenseMatrix)Gamma.TransposeThisAndMultiply(k) * Gamma; // globalize
@@ -258,7 +260,7 @@ namespace Terwiel.Glaucon
 
                 g.SetSubVector(3, 3, temp);
                 g.SetSubVector(9, 3, -temp);
-                g *= (Mat.Density * As[0] * Length);
+                g *= (Mat.Density * As[0] * Length); // As[0] is area cross section
                 return g;
             }
 
@@ -344,7 +346,7 @@ namespace Terwiel.Glaucon
                 // [F'] = [Γ] * [k] * [Δ] = local force vector
 
                 // translations:
-                axial_strain = (d.SubVector(6, 3) - d.SubVector(0, 3)) * Gamma.Row(0).SubVector(0, 3) / Le;
+                axial_strain = (d.SubVector(6, 3) - d.SubVector(0, 3)) * Gamma.Row(0).SubVector(0, 3) / L_eff;
                 if (Math.Abs(axial_strain) > Param.StrainLimit)
                 {
                     Errors.Add($"Member {Nr + 1} has excess axial strain.");
@@ -371,12 +373,12 @@ namespace Terwiel.Glaucon
                 var t7 = Gamma[2, 0];
                 var t8 = Gamma[2, 1];
                 var t9 = Gamma[2, 2];
-                s[0] = -(As[0] * Mat.E / Le) * ((d[6] - d[0]) * t1 + (d[7] - d[1]) * t2 + (d[8] - d[2]) * t3);
+                s[0] = -(As[0] * Mat.E / L_eff) * ((d[6] - d[0]) * t1 + (d[7] - d[1]) * t2 + (d[8] - d[2]) * t3);
 
                 var T = Param.AccountForGeomStability ? -s[0] : 0;
 
                 double Le3, Le2;
-                s[1] = -(12.0 * Mat.E * Iz[2] / ((Le3 = Le * (Le2 = Le * Le)) * (1.0 + Ksy))
+                s[1] = -(12.0 * Mat.E * Iz[2] / ((Le3 = L_eff * (Le2 = L_eff * L_eff)) * (1.0 + Ksy))
                         + T / Length * (1.2 + 2.0 * Ksy + Ksy * Ksy) / Dsy) *
                     ((d[6] - d[0]) * t4 + (d[7] - d[1]) * t5 + (d[8] - d[2]) * t6)
                     + (6.0 * Mat.E * Iz[2] / (Le2 * (1.0 + Ksy)) + T / 10.0 / Dsy) *
@@ -388,22 +390,22 @@ namespace Terwiel.Glaucon
                     - (6.0 * Mat.E * Iz[1] / (Le2 * (1.0 + Ksz)) + T / 10.0 / Dsz) *
                     ((d[3] + d[9]) * t4 + (d[4] + d[10]) * t5 + (d[5] + d[11]) * t6);
 
-                s[3] = -(Mat.G * Iz[0] / Le) * ((d[9] - d[3]) * t1 + (d[10] - d[4]) * t2 + (d[11] - d[5]) * t3);
+                s[3] = -(Mat.G * Iz[0] / L_eff) * ((d[9] - d[3]) * t1 + (d[10] - d[4]) * t2 + (d[11] - d[5]) * t3);
 
                 s[4] = (6.0 * Mat.E * Iz[1] / (Le2 * (1.0 + Ksz)) + T / 10.0 / Dsz) *
                     ((d[6] - d[0]) * t7 + (d[7] - d[1]) * t8 + (d[8] - d[2]) * t9)
-                    + ((4.0 + Ksz) * Mat.E * Iz[1] / (Le * (1.0 + Ksz)) +
+                    + ((4.0 + Ksz) * Mat.E * Iz[1] / (L_eff * (1.0 + Ksz)) +
                         T * Length * (2.0 / 15.0 + Ksz / 6.0 + Ksz * Ksz / 12.0) / Dsz) *
                     (d[3] * t4 + d[4] * t5 + d[5] * t6)
-                    + ((2.0 - Ksz) * Mat.E * Iz[1] / (Le * (1.0 + Ksz)) -
+                    + ((2.0 - Ksz) * Mat.E * Iz[1] / (L_eff * (1.0 + Ksz)) -
                         T * Length * (1.0 / 30.0 + Ksz / 6.0 + Ksz * Ksz / 12.0) / Dsz) *
                     (d[9] * t4 + d[10] * t5 + d[11] * t6);
                 s[5] = -(6.0 * Mat.E * Iz[2] / (Le2 * (1.0 + Ksy)) + T / 10.0 / Dsy) *
                     ((d[6] - d[0]) * t4 + (d[7] - d[1]) * t5 + (d[8] - d[2]) * t6)
-                    + ((4.0 + Ksy) * Mat.E * Iz[2] / (Le * (1.0 + Ksy)) +
+                    + ((4.0 + Ksy) * Mat.E * Iz[2] / (L_eff * (1.0 + Ksy)) +
                         T * Length * (2.0 / 15.0 + Ksy / 6.0 + Ksy * Ksy / 12.0) / Dsy) *
                     (d[3] * t7 + d[4] * t8 + d[5] * t9)
-                    + ((2.0 - Ksy) * Mat.E * Iz[2] / (Le * (1.0 + Ksy)) -
+                    + ((2.0 - Ksy) * Mat.E * Iz[2] / (L_eff * (1.0 + Ksy)) -
                         T * Length * (1.0 / 30.0 + Ksy / 6.0 + Ksy * Ksy / 12.0) / Dsy) *
                     (d[9] * t7 + d[10] * t8 + d[11] * t9);
                 s[6] = -s[0];
@@ -413,19 +415,19 @@ namespace Terwiel.Glaucon
 
                 s[10] = (6.0 * Mat.E * Iz[1] / (Le2 * (1.0 + Ksz)) + T / 10.0 / Dsz) *
                     ((d[6] - d[0]) * t7 + (d[7] - d[1]) * t8 + (d[8] - d[2]) * t9)
-                    + ((4.0 + Ksz) * Mat.E * Iz[1] / (Le * (1.0 + Ksz)) +
+                    + ((4.0 + Ksz) * Mat.E * Iz[1] / (L_eff * (1.0 + Ksz)) +
                         T * Length * (2.0 / 15.0 + Ksz / 6.0 + Ksz * Ksz / 12.0) / Dsz) *
                     (d[9] * t4 + d[10] * t5 + d[11] * t6)
-                    + ((2.0 - Ksz) * Mat.E * Iz[1] / (Le * (1.0 + Ksz)) -
+                    + ((2.0 - Ksz) * Mat.E * Iz[1] / (L_eff * (1.0 + Ksz)) -
                         T * Length * (1.0 / 30.0 + Ksz / 6.0 + Ksz * Ksz / 12.0) / Dsz) *
                     (d[3] * t4 + d[4] * t5 + d[5] * t6);
 
                 s[11] = -(6.0 * Mat.E * Iz[2] / (Le2 * (1.0 + Ksy)) + T / 10.0 / Dsy) *
                     ((d[6] - d[0]) * t4 + (d[7] - d[1]) * t5 + (d[8] - d[2]) * t6)
-                    + ((4.0 + Ksy) * Mat.E * Iz[2] / (Le * (1.0 + Ksy)) +
+                    + ((4.0 + Ksy) * Mat.E * Iz[2] / (L_eff * (1.0 + Ksy)) +
                         T * Length * (2.0 / 15.0 + Ksy / 6.0 + Ksy * Ksy / 12.0) / Dsy) *
                     (d[9] * t7 + d[10] * t8 + d[11] * t9)
-                    + ((2.0 - Ksy) * Mat.E * Iz[2] / (Le * (1.0 + Ksy)) -
+                    + ((2.0 - Ksy) * Mat.E * Iz[2] / (L_eff * (1.0 + Ksy)) -
                         T * Length * (1.0 / 30.0 + Ksy / 6.0 + Ksy * Ksy / 12.0) / Dsy) *
                     (d[3] * t7 + d[4] * t8 + d[5] * t9);
 #else
@@ -435,7 +437,7 @@ namespace Terwiel.Glaucon
             // double t1 = Gamma[0, 0]; double t2 = Gamma[0, 1]; double t3 = Gamma[0, 2];
             //double t4 = Gamma[1, 0]; double t5 = Gamma[1, 1]; double t6 = Gamma[1, 2];
             //double t7 = Gamma[2, 0]; double t8 = Gamma[2, 1]; double t9 = Gamma[2, 2];
-            //double A = -((double) As[0] * (double)E / Le) * (double) ((d[6] - d[0]) * t1 + (d[7] - d[1]) * t2 + (d[8] - d[2]) * t3);
+            //double A = -((double) As[0] * (double)E / L_eff) * (double) ((d[6] - d[0]) * t1 + (d[7] - d[1]) * t2 + (d[8] - d[2]) * t3);
            //  double A = (d.SubVector(6,3) - d.SubVector(0,3)) * Gamma.Row(0);
             //T = Geom ? A : 0;
 

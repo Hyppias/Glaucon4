@@ -17,11 +17,11 @@ using System.Runtime.InteropServices;
 using System.Xml.Serialization;
 using MathNet.Numerics.LinearAlgebra;
 using Mkl;
+using dm = MathNet.Numerics.LinearAlgebra.Double.DenseMatrixExtensions;
 using MathNet.Numerics.LinearAlgebra.Double;
-
-using Newtonsoft.Json;
 using MathNet.Numerics.LinearAlgebra.Factorization;
 using System.Numerics;
+using Newtonsoft.Json;
 
 namespace Terwiel.Glaucon
 {
@@ -97,29 +97,13 @@ namespace Terwiel.Glaucon
 
                 switch (Param.ModalMethod)
                 {
-                    case 7:
-                        // Cholesky factor of B.
-                        var L = M.Cholesky().Factor;
+                    case EVG: // = 7
+                        // see https://github.com/wo80/mathnet-extensions/blob/master/src/Numerics/LinearAlgebra/Double/DenseMatrixExtensions.cs
 
-                        // Compute L^-1.
-                        InvertLowerTriangle((DenseMatrix)L);
-
-                        // Compute L^-t = (L^-1)^t.
-                        var Lt = L.Transpose();
-
-                        // Save L^-t for recovery of eigenvectors.
-                        var copy = (DenseMatrix)Lt.Clone();
-
-                        // Build L^-1 * A * L^-t
-                        A.Multiply(Lt, Lt);
-                        L.Multiply(Lt, Lt);
-
-                        var evd = Lt.Evd(Symmetricity.Symmetric);
-
-                        // Recover eigenvectors.
-                        copy.Multiply(evd.EigenVectors, E);
-
-                        return evd.EigenValues;
+                        DenseMatrix EigenVectors =new DenseMatrix(DoF); // Bathe ?
+                            
+                        var eigenValues = dm.GeneralizedEigenvalues(K,M,EigenVectors);
+                        
                         break;
                     case MKL:
                         omega2 = new DenseVector(DoF); // square of omega

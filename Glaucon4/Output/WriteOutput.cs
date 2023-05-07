@@ -63,7 +63,7 @@ namespace Terwiel.Glaucon
                     new List<object[]>
                     {
                     new object[] {"nodes", Nodes.Count},
-                    new object[] {$"fixed node{ws(NodeRestraints.Count)}", NodeRestraints.Count},
+                    new object[] {$"fixed node{ws(NodesRestraints.Count)}", NodesRestraints.Count},
                     new object[] {$"Member{ws(Members.Count)}", Members.Count},
                     new object[] {$"load case{ws(LoadCases.Count)}", LoadCases.Count},
                     new object[] {"Structural mass", StructMass}
