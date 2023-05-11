@@ -24,7 +24,7 @@ namespace Terwiel.Glaucon
         /// </summary>
         public partial class LoadCase
         {
-             /// <summary>
+            /// <summary>
             /// Gets the load nr.
             /// </summary>
             public int Nr { get; set; }
@@ -112,8 +112,8 @@ namespace Terwiel.Glaucon
             /// total reaction force vector.
             /// </summary>
             public DenseMatrix Reactions;
-
-            public LoadCase(){ }
+            #region Constructors
+            public LoadCase() { }
 
             public LoadCase(
                 int nr,
@@ -139,6 +139,7 @@ namespace Terwiel.Glaucon
                 IntPointLoads = ip;
                 Active = active;
             }
+            #endregion
 
             /// <summary>
             /// Initializes a new instance of the <see cref="LoadCase"/> class.
@@ -146,7 +147,7 @@ namespace Terwiel.Glaucon
             /// <Param name="Nr">
             /// Load case number
             /// </Param>
-            /// <Param name="mbrs">
+            /// <Param name="members">
             /// Construction members.
             /// </Param>
             /// <Param name="DoF">
@@ -154,10 +155,10 @@ namespace Terwiel.Glaucon
             /// </Param>
             /// <exception cref="InvalidDataException">
             /// </exception>
-            public void ProcessData(int Nr, List<Member> mbrs, int DoF)
+            public void ProcessData(List<Member> members, int DoF)
             {
-                Contract.Requires(mbrs != null);
-                int mbrCount = mbrs.Count;
+                Contract.Requires(members != null);
+                int mbrCount = members.Count;
                 Contract.Requires(mbrCount > 0);
 
                 Q = new DenseMatrix(mbrCount, 12);
@@ -199,33 +200,35 @@ namespace Terwiel.Glaucon
                 }
 
                 for (var i = 0; i < mbrCount; i++)
-                    mbrs[i].GetGravityLoadVector(g).CopyTo(eqFMech[i]);
-
-                // node point loads in global structural coordinates
-
-                foreach (var pl in NodalLoads)
                 {
-                    hasMechLoads = true;
-                    // ! global structural coordinates ! 
-                    var n = pl.NodeNr; // node Nr. base 0
-                    for (var j = 0; j < 6; j++)
-                        // NOT added to the equiv. force vector!!
-                        MechForces[6 * n + j, 0] = pl.Load[j];
+                    members[i].GetGravityLoadVector(g).CopyTo(eqFMech[i]);
                 }
 
+                // node point loads in global structural coordinates
+                if (NodalLoads != null && NodalLoads.Any())
+                {
+                    foreach (var pl in NodalLoads)
+                    {
+                        hasMechLoads = true;
+                        // ! global structural coordinates ! 
+                        var n = pl.NodeNr; // node Nr. base 0
+                        for (var j = 0; j < 6; j++)
+                            // NOT added to the equiv. force vector!!
+                            MechForces[6 * n + j, 0] = pl.Load[j];
+                    }
+                }
                 WriteMatrix(MEMBER, $"lc_{Nr}_", "F_mech_node.mat", "F_mech_node", MechForces);
 
-                // uniformly distributed loads, (UnifLods)
-                //var nU = buffer.ReadInt32();
-                if (UniformLoads != null)
-                {                    
+                // uniformly distributed loads
+                if (UniformLoads != null && UniformLoads.Any())
+                {
                     foreach (var uLoad in UniformLoads)
                     {
                         // local member coordinates !
                         int n;
                         var fixedEndForces = new DenseVector(12); // temp vector
 
-                        var mbr = mbrs[n = uLoad.MemberNr];
+                        var mbr = members[n = uLoad.MemberNr];
                         fixedEndForces = uLoad.GetLoadVector(mbr);
 #if false
                         var effLength = mbr.L_eff;                       
@@ -245,15 +248,15 @@ namespace Terwiel.Glaucon
                         if (Param.QLoadsLocal)
                             eqFMech[n] += (DenseVector)mbr.Gamma.TransposeThisAndMultiply(fixedEndForces);
                         else
-                            eqFMech[n] += fixedEndForces;                        
+                            eqFMech[n] += fixedEndForces;
                     }
-                     hasMechLoads |= UniformLoads.Count > 0;
+                    hasMechLoads |= UniformLoads.Count > 0;
                     // end uniformly distributed loads
                 }
 
                 // trapezoidal distributed loads (TrapLoads)
                 // nW = buffer.ReadInt32();
-                if (TrapLoads != null)
+                if (TrapLoads != null && TrapLoads.Any())
                 {
                     Lg($"There are {TrapLoads.Count} trapezoidally-distributed loads");
 
@@ -261,14 +264,14 @@ namespace Terwiel.Glaucon
                     {
                         // ! local member coordinates ! 
                         var fixedEndForces = new DenseVector(12);
-                        var mbr = mbrs[trap.MemberNr];
+                        var mbr = members[trap.MemberNr];
                         trap.GetLoadVector(mbr);
 
 #if false
                         double R1o = 0, R2o = 0, f01 = 0, f02 = 0;
                         // var trap = new TrapLoad();
 
-                        // var mbr = mbrs[trap.MemberNr];
+                        // var mbr = members[trap.MemberNr];
                         var length = mbr.Length;
 
                         // x-axis trapezoidal loads (along the frame member length) 
@@ -312,41 +315,41 @@ namespace Terwiel.Glaucon
 
                 // internal member point loads (IntPointLoads)
                 //var nP = buffer.ReadInt32();
-                if (IntPointLoads != null)
+                if (IntPointLoads != null && (IntPointLoads.Any()))
                 {
                     foreach (var pl in IntPointLoads.Where(ld => ld.Active))
                     {
                         // ! local member coordinates ! 
                         //var pointLoad = new PointLoad();
                         int n;
-                        var mbr = mbrs[n = pl.MemberNr];
+                        var mbr = members[n = pl.MemberNr];
 
                         var FixedEndForces = pl.GetLoadVector(mbr);
 
                         eqFMech[n] += (DenseVector)mbr.Gamma.TransposeThisAndMultiply(FixedEndForces);
-                        
+
                     }
                     hasMechLoads |= IntPointLoads.Count > 0;
                 }
 
                 // thermal loads are treated differntly from the other load types
-                
-                if (TempLoads.Count > 0)
+
+                if (TempLoads != null && TempLoads.Any())
                 {
                     // moved to the member's eqFTemp vector:
                     foreach (var tl in TempLoads)
                     {
                         // ! local member coordinates ! 
                         var n = tl.MemberNr; // Member Nr. base 0
-                                           
-                        var mbr = mbrs[n];
+
+                        var mbr = members[n];
                         var FixedEndForces = tl.GetLoadVector(mbr);
 
                         // {F} = [T]'{Q} 
                         // add to equiv. temp load vector
                         eqFTemp[n] += (DenseVector)mbr.Gamma.TransposeThisAndMultiply(FixedEndForces);
 
-                        TempLoads.Add(tl);// TODO: is this superfluous?
+                        //TempLoads.Add(tl);// TODO: is this superfluous?
                     }
                 }
 
@@ -354,8 +357,8 @@ namespace Terwiel.Glaucon
                 // separate load vectors for mechanical and thermal loading
                 for (var n = 0; n < mbrCount; n++)
                 {
-                    var n1 = mbrs[n].NodeA.Nr * 6;
-                    var n2 = mbrs[n].NodeB.Nr * 6;
+                    var n1 = members[n].NodeA.Nr * 6;
+                    var n2 = members[n].NodeB.Nr * 6;
                     for (var i = 0; i < 6; i++)
                     {
                         MechForces[n1 + i, 0] += eqFMech[n][i];
@@ -387,9 +390,8 @@ namespace Terwiel.Glaucon
                             PrescrDispl[6 * n + j, 0] = disp;
                         }
                     }
-                    //hasMechLoads |= PrescrDisplacements.Count > 0;
                 }
-            }           
+            }
             /*
             System matix partitioning:
             See Logan, pg. 37, formula 2.5.1 or
@@ -409,38 +411,38 @@ namespace Terwiel.Glaucon
 
             So SSM has the permutated system stiffness matrix:
             */
-            private static DenseMatrix Kff => (DenseMatrix)SSM.SubMatrix(0, FreePart, 0, FreePart);
+            private static DenseMatrix Kff => (DenseMatrix)SSM.SubMatrix(0, FreeCount, 0, FreeCount);
 
-            private static DenseMatrix Kfs => (DenseMatrix)SSM.SubMatrix(0, FreePart, FreePart, DoF - FreePart);
+            private static DenseMatrix Kfs => (DenseMatrix)SSM.SubMatrix(0, FreeCount, FreeCount, DoF - FreeCount);
 
             // We don't wat the part Kss:
-            // DenseMatrix Kss => (DenseMatrix) SSM.SubMatrix(FreePart, DoF - FreePart, FreePart, DoF - FreePart);
-            private static DenseMatrix Ksf => (DenseMatrix)SSM.SubMatrix(FreePart, DoF - FreePart, 0, FreePart);
+            // DenseMatrix Kss => (DenseMatrix) SSM.SubMatrix(FreeCount, DoF - FreeCount, FreeCount, DoF - FreeCount);
+            private static DenseMatrix Ksf => (DenseMatrix)SSM.SubMatrix(FreeCount, DoF - FreeCount, 0, FreeCount);
 
-            private DenseMatrix Displacements1 => (DenseMatrix)Displacements.SubMatrix(0, FreePart, 0, 1);
+            private DenseMatrix Displacements1 => (DenseMatrix)Displacements.SubMatrix(0, FreeCount, 0, 1);
 
             private DenseMatrix Displacements2 =>
-                (DenseMatrix)Displacements.SubMatrix(FreePart, DoF - FreePart, 0, 1);
+                (DenseMatrix)Displacements.SubMatrix(FreeCount, DoF - FreeCount, 0, 1);
 
-            private DenseMatrix F_mech1 => (DenseMatrix)MechForces.SubMatrix(0, FreePart, 0, 1);
+            private DenseMatrix F_mech1 => (DenseMatrix)MechForces.SubMatrix(0, FreeCount, 0, 1);
 
-            private DenseMatrix F_mech2 => (DenseMatrix)MechForces.SubMatrix(FreePart, DoF - FreePart, 0, 1);
+            private DenseMatrix F_mech2 => (DenseMatrix)MechForces.SubMatrix(FreeCount, DoF - FreeCount, 0, 1);
 
-            private DenseMatrix F_temp1 => (DenseMatrix)TempForces.SubMatrix(0, FreePart, 0, 1);
+            private DenseMatrix F_temp1 => (DenseMatrix)TempForces.SubMatrix(0, FreeCount, 0, 1);
 
-            private DenseMatrix Ff => (DenseMatrix)F.SubMatrix(0, FreePart, 0, 1);
+            private DenseMatrix Ff => (DenseMatrix)F.SubMatrix(0, FreeCount, 0, 1);
 
-            private DenseMatrix Fs => (DenseMatrix)F.SubMatrix(FreePart, DoF - FreePart, 0, 1);
-
-            /// <summary>
-            /// Gets the partial vector of the prescribed displacements.
-            /// </summary>
-            private DenseMatrix PDf => (DenseMatrix)PrescrDispl.SubMatrix(0, FreePart, 0, 1);
+            private DenseMatrix Fs => (DenseMatrix)F.SubMatrix(FreeCount, DoF - FreeCount, 0, 1);
 
             /// <summary>
             /// Gets the partial vector of the prescribed displacements.
             /// </summary>
-            private DenseMatrix PDs => (DenseMatrix)PrescrDispl.SubMatrix(FreePart, DoF - FreePart, 0, 1);
+            private DenseMatrix PDf => (DenseMatrix)PrescrDispl.SubMatrix(0, FreeCount, 0, 1);
+
+            /// <summary>
+            /// Gets the partial vector of the prescribed displacements.
+            /// </summary>
+            private DenseMatrix PDs => (DenseMatrix)PrescrDispl.SubMatrix(FreeCount, DoF - FreeCount, 0, 1);
 
             /// <summary>
             /// Solve the matrix equation with MatNet.
@@ -477,10 +479,10 @@ namespace Terwiel.Glaucon
                 Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
                 Contract.Requires(Members != null);
                 Displacements = new DenseMatrix(DoF, 1); // displacments of all nodes
-                Reactions = new DenseMatrix(DoF - FreePart, 1); // reaction forces			
+                Reactions = new DenseMatrix(DoF - FreeCount, 1); // reaction forces			
 
-                var dReaction = new DenseMatrix(DoF - FreePart, 1); // incremental reaction forces	
-                var delta_f = new DenseMatrix(FreePart, 1); // incremental displ. of all free DoFs		
+                var dReaction = new DenseMatrix(DoF - FreeCount, 1); // incremental reaction forces	
+                var delta_f = new DenseMatrix(FreeCount, 1); // incremental displ. of all free DoFs		
 
                 // global system stiffness matrix  [SSM({D}^(i))], {D}^(0)={0} (i=0) 
                 AssembleSystemStiffnessMatrix(Members); // is permuted now. No geometric stability yet
@@ -503,7 +505,7 @@ namespace Terwiel.Glaucon
                     // solve {F_t} = [SSM({D=0})] *{D_t}
                     SolveIt(Kff, F_temp1).CopyTo(delta_f);
 
-                    Displacements.SetSubMatrix(0, FreePart, 0, 1, delta_f);
+                    Displacements.SetSubMatrix(0, FreeCount, 0, 1, delta_f);
 
                     // See McGuire pg 41, form 3.8.b
                     dReaction = Ksf * delta_f;
@@ -534,7 +536,7 @@ namespace Terwiel.Glaucon
                     {
                         PrescrDispl.PermuteRows(Perm);
                         var F_ = Kfs * PDs;
-                        MechForces.SetSubMatrix(0, FreePart, 0, 1, F_mech1 - F_);
+                        MechForces.SetSubMatrix(0, FreeCount, 0, 1, F_mech1 - F_);
                     }
 
                     WriteMatrix(MEMBER, $"LC_{Nr}_", "Kfs.mat", "Kfs", Kfs);
@@ -546,13 +548,13 @@ namespace Terwiel.Glaucon
                     // combine {D} = {D_t} + {D_m}	
                     Displacements.SetSubMatrix(
                         0,
-                        FreePart,
+                        FreeCount,
                         0,
                         1,
                         Displacements1 + delta_f); // permuted displacement vector 
                     if (PrescrDispl != null)
                         // PDs would throw a null reference exception if tere are no prescribed displacements:
-                        Displacements.SetSubMatrix(FreePart, DoF - FreePart,
+                        Displacements.SetSubMatrix(FreeCount, DoF - FreeCount,
                             0, 1, PDs);
 
                     dReaction = Ksf * Displacements1 - F_mech2; // OK
@@ -566,7 +568,7 @@ namespace Terwiel.Glaucon
                 // mechanical plus temperature loads displacements {D}	
                 MembersEndForces(Members);
 
-                var dF = new DenseMatrix(FreePart, 1);
+                var dF = new DenseMatrix(FreeCount, 1);
 
                 // check the equilibrium error	
                 error = EquilibriumError(ref dF);
@@ -597,7 +599,7 @@ namespace Terwiel.Glaucon
                         SolveIt(Kff, dF).CopyTo(delta_f);
 
                         // increment {D}^(i+1) = {D}^(i) + {dD}^(i)	
-                        Displacements.SetSubMatrix(0, FreePart, 0, 1, Displacements1 + delta_f);
+                        Displacements.SetSubMatrix(0, FreeCount, 0, 1, Displacements1 + delta_f);
 
                         // member forces {Q} for displacements after i-th iteration:      
                         MembersEndForces(Members);
@@ -653,13 +655,13 @@ namespace Terwiel.Glaucon
             /// </summary>
             /// <Param name="members">Collection of frame elements</Param>
             private void MembersEndForces(List<Member> members)
-            {                
+            {
                 var d = new DenseMatrix(DoF, 1);
                 Displacements.CopyTo(d);
                 d.PermuteRows(Perm.Inverse());
                 var dGlobal = new DenseVector(12);
 
-                // Parallel.ForEach(mbrs, mbr =>
+                // Parallel.ForEach(members, mbr =>
                 int n = 0;
                 foreach (var mbr in members)
                 {

@@ -43,7 +43,7 @@ namespace UnitTestGlaucon
             Shift = 10.0,
             InputSource = 1
         };
-        public Glaucon Glaucon = new()
+        Glaucon Glaucon = new()
         {
 
             Title = "Example B: a pyramid-shaped frame --- static and dynamic analysis (N,mm,ton)",

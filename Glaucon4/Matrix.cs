@@ -266,7 +266,7 @@ namespace Terwiel.Glaucon
         /// <param name="solve">1: do a back substitution for {x};  0: do no bk-sub'n</param>
         /// <param name="pd">1: positive diagonal  and  successful LU decomp'n	</param>
         /// </summary>
-        public void ldl_dcmp(DenseMatrix A, int n, DenseVector d, DenseVector b, DenseVector x,
+        public static void ldl_dcmp(DenseMatrix A, int n, DenseVector d, DenseVector b, DenseVector x,
             bool reduce, bool solve, ref int pd)
         {
             pd = 0; // number of negative elements on the diagonal of D
@@ -368,7 +368,7 @@ namespace Terwiel.Glaucon
         /// <param name="x">the solution vector	</param>
         /// <param name="rms_resid"></param>
         /// <param name="ok"></param>
-        private void ldl_mprove(DenseMatrix A, int n, DenseVector d, DenseVector b, DenseVector x,
+        private static void ldl_mprove(DenseMatrix A, int n, DenseVector d, DenseVector b, DenseVector x,
             ref double rms_resid, ref int ok)
         {
             //double sdp;        // accumulate the r.h.s. in double precision                	  	
@@ -666,7 +666,7 @@ namespace Terwiel.Glaucon
         /// <param name="A"></param>
         /// <param name="Y"></param>
         /// <param name="Ac"></param>
-        private void xtinvAy(DenseMatrix X, DenseMatrix A, DenseMatrix Y, DenseMatrix Ac)
+        private static void xtinvAy(DenseMatrix X, DenseMatrix A, DenseMatrix Y, DenseMatrix Ac)
         {
             // double[] diag, x, y;
             // double error;

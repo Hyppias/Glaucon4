@@ -14,7 +14,7 @@ namespace UnitTestGlaucon
 {
     public partial class UnitTestCoCa1 : UnitTestBase
     { 
-        public DenseMatrix? deflection , Reactions, EndForces;
+        //public DenseMatrix? deflection , Reactions, EndForces;
 
         [Test]
         public void TestCoCa1()

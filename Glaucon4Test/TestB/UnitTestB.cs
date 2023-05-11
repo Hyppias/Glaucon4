@@ -16,11 +16,10 @@ namespace UnitTestGlaucon
     [TestFixture]
     public partial class UnitTestB : UnitTestBase
     {
-        public DenseMatrix? deflection , Reactions, EndForces;
+        //public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestB()
         {
-
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);
             foreach (var e in gl.Glaucon.Errors) //for (int i = 0; i < gl.Glaucon.Errors.Count; i++)
                 Debug.WriteLine(e);

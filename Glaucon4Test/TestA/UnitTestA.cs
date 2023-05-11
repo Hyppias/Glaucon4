@@ -10,8 +10,7 @@ namespace UnitTestGlaucon
         
         [Test]
         public void TestA()
-        {
-            Glaucon = CreateGlaucon();
+        {            
             Glaucon.ProcessGlaucon(Param);
             Glaucon.BaseFile = MethodBase.GetCurrentMethod().Name;
             var result = Glaucon.Execute(ref deflection, ref Reactions, ref EndForces);

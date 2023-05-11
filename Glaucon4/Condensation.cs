@@ -21,38 +21,41 @@ namespace Terwiel.Glaucon
     public partial class Glaucon
     {
         // CondensationMethod (Cmethod): 1 = static, 2 = Guyan, 3 = Dynamic 
-        private void ReadCondensationData()
+        private void ProcessCondensationData()
         {
-            Cdof = 0;
             if (CondensedNodes.Count > Nodes.Count)
             {
                 string message = $"number of nodes with DoF's to condense {CondensedNodes.Count} larger than number of nodes {Nodes.Count}";
 
                 throw new ArgumentOutOfRangeException(message);
             }
+
             if (Param.CondensationMethod > 3)
             {
                 Param.CondensationMethod = 1;
             }
 
-            DoFToCondense = new int[DoF]; // array c in FRAME3DD
+            // array c in FRAME3DD
+            DoFsToCondense = new int[DoF];
+            // List was already set up, but DoF number are still base 1
             foreach (var cn in CondensedNodes) // List was already set up, but DoF number are still index 1
             {
-                if (cn.NodeNr < 1 || cn.NodeNr > Nodes.Count)
+                cn.NodeNr--; // adjust node numbering to base 0
+                if (cn.NodeNr < 0 || cn.NodeNr > Nodes.Count - 1)
                 {
                     string message = $"Node number ({cn.NodeNr}) out of range in condensation data.";
-
                     throw new IndexOutOfRangeException(message);
                 }
-                cn.NodeNr--;
-                // set up the Vector of DoFs to condense:
+
+                Cdof = 0; // for being sure
+                // set up the array of DoFs to condense:
                 for (var j = 0; j < 6; j++)
                 {
-                    if (cn.DoFToCondense[j] != 0) // read 1's and 0's
+                    if (cn.DoFs[j] != 0) // read 1's and 0's
                     {
-                        Cdof++;
                         // make a list of DoF's to condense (c[] in FRAME3DD)
-                        DoFToCondense[6 * cn.NodeNr + j] = cn.DoFToCondense[j] - 1;
+                        DoFsToCondense[Cdof] = 6 * cn.NodeNr + j; ///cn.DoFToCondense[j];
+                        Cdof++;
                     }
                 }
             }
@@ -64,30 +67,38 @@ namespace Terwiel.Glaucon
             {
                 throw new ArgumentOutOfRangeException(
                     $"The number of to be computed vibration modes ({Param.DynamicModesCount}) may\n" +
-                    $" may not exceed the number of required modes of condensatio({Cdof}) when\n" +
+                    $" may not exceed the number of required modes of condensation ({Cdof}) when\n" +
                     "using dynamic condensation.");
             }
 
             // when using static condensation, only first mode is matched:
-            for(int i=0; i < (Param.CondensationMethod == 1 ? 1 :MatchedCondenseModes.Length); i++)
+            for (int i = 0; i < (Param.CondensationMethod == 1 ? 1 : MatchedCondenseModes.Length); i++)
             {
                 if (MatchedCondenseModes[i] < 0 || MatchedCondenseModes[i] < Cdof)
                 {
-                    throw new ArgumentOutOfRangeException($"Condensation mode {i+1} out of range");
+                    throw new ArgumentOutOfRangeException($"Condensation mode {i + 1} out of range");
                 }
             }
         }
 
         /// <summary>
         /// STATIC_CONDENSATION - of stiffness matrix from NxN to nxn
+        /// The original vector c is DoF long, but only the lower elements
+        /// have a DoF number, for which the DoF was set  to 1.
+        /// CDof was the number of DoFs having a 1 entered, so the first part os array c.
         /// Original name: static_condensation
         /// </summary>
-        public void StaticCondensation()
+        /// <see cref="https://www.youtube.com/watch?v=E-KxCovY6OU"/>
+        /// <seealso cref="McGuire et al. page 376"/>
+        /// <seealso cref="Bathe, Finite element procedures, 
+        /// PHI Learning Private Limited, Delhi 110092, 2015, page 720"/>
+        public static void StaticCondensation()
         {
-            var n = DoFToCondense.Length;
+            var n = Cdof;
             Kc = new DenseMatrix(n);
             var Arr = new DenseMatrix(DoF - n);
             var Arc = new DenseMatrix(DoF - n, n);
+            // gather all 1's from DoFToCondense in r
             var r = GenerateListOfDoFNotToCondense(DoF);
 
             for (var i = 0; i < DoF - n; i++)
@@ -107,7 +118,7 @@ namespace Terwiel.Glaucon
                 for (var j = 0; j < n; j++) /* use only upper triangle of K */
                 {
                     var ri = r[i];
-                    var cj = DoFToCondense[j];
+                    var cj = DoFsToCondense[j];
                     if (ri < cj)
                     {
                         Arc[i, j] = K[ri, cj];
@@ -119,14 +130,14 @@ namespace Terwiel.Glaucon
                 }
             }
             xtinvAy(Arc, Arr, Arc, Kc); // uses symmetry
-                                        // Kc = (DenseMatrix) Arc.Transpose().Inverse() * Arr * Arc;
+            // Kc = (DenseMatrix) Arc.Transpose().Inverse() * Arr * Arc;
 
             for (var i = 0; i < n; i++)
             {
                 for (var j = i; j < n; j++) /* use only upper triangle of A */
                 {
-                    var ci = DoFToCondense[i];
-                    var cj = DoFToCondense[j];
+                    var ci = DoFsToCondense[i];
+                    var cj = DoFsToCondense[j];
                     if (ci <= cj)
                     {
                         Kc[j, i] = Kc[i, j] = K[ci, cj] - Kc[i, j];
@@ -145,7 +156,7 @@ namespace Terwiel.Glaucon
         {
             Debug.WriteLine("Enter " + MethodBase.GetCurrentMethod().Name);
             //int N = M.RowCount;
-            var n = DoFToCondense.Length;
+            var n = DoFsToCondense.Length;
             Mc = new DenseMatrix(n);
             Kc = new DenseMatrix(n);
 
@@ -180,7 +191,7 @@ namespace Terwiel.Glaucon
                 for (var j = 0; j < n; j++) /* use only upper triangle of K,M */
                 {
                     var ri = r[i];
-                    var cj = DoFToCondense[j];
+                    var cj = DoFsToCondense[j];
                     if (ri < cj)
                     {
                         Drc[i, j] = K[ri, cj] - w2 * M[ri, cj];
@@ -200,10 +211,10 @@ namespace Terwiel.Glaucon
             {
                 for (var j = 0; j < n; j++)
                 {
-                    T[DoFToCondense[i], j] = 0.0;
+                    T[DoFsToCondense[i], j] = 0.0;
                 }
 
-                T[DoFToCondense[i], i] = 1.0;
+                T[DoFsToCondense[i], i] = 1.0;
             }
 
             for (var i = 0; i < DoF - n; i++)
@@ -227,14 +238,14 @@ namespace Terwiel.Glaucon
         {
             double traceM = 0;
 
-            var n = DoFToCondense.Length;
+            var n = DoFsToCondense.Length;
             //int N = M.RowCount;
             var P = new DenseMatrix(n, n);
 
             for (var i = 0; i < n; i++) /* first n modal vectors at primary DoF's */
                 for (var j = 0; j < n; j++)
                 {
-                    P[i, j] = Eigenvector[DoFToCondense[i], MatchedCondenseModes[j]];
+                    P[i, j] = Eigenvector[DoFsToCondense[i], MatchedCondenseModes[j]];
                 }
 
             //PseudoInv(P, ref invP, 1e-9);
@@ -275,19 +286,30 @@ namespace Terwiel.Glaucon
         /// </summary>
         /// <param name="max">DoF's in the construction (nr. of rows in the stiffness matrix)</param>
         /// <returns>the list of non-condensed DoF's</returns>
-        private int[] GenerateListOfDoFNotToCondense(int max)
+        private static int[] GenerateListOfDoFNotToCondense(int max)
         {
             var DoFNotCondensed = new int[DoF];
-            for (int i=0; i < DoF; i++)
-            {                
-                DoFNotCondensed[i] = -1;
-            }
-            for (int i=0; i < DoFToCondense.Length; i++)
-            {
-                DoFNotCondensed[DoFToCondense[i] - 1] = 1;
-            }
 
-            return  DoFNotCondensed;
+            int k = 0;
+            bool ok;
+
+            for (int i = 0; i < DoF; i++)
+            {
+                ok = true;
+                for (int j = 0; j < Cdof; j++)
+                {
+                    if (DoFsToCondense[j] == i)
+                    {
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok)
+                {
+                    DoFNotCondensed[k++] = i;
+                }
+            }
+            return DoFNotCondensed;
         }
     }
 }

@@ -11,6 +11,20 @@
     <EnableNETAnalyzers>False</EnableNETAnalyzers>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;CS8601</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;CS8601</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestH\**" />
+    <EmbeddedResource Remove="TestH\**" />
+    <None Remove="TestH\**" />
+  </ItemGroup>
+
   <ItemGroup>
     <Compile Remove="Resources\TestTemplate.cs" />
     <Compile Remove="TestCondensation.cs" />

@@ -47,14 +47,14 @@ namespace Terwiel.Glaucon
 
             try
             {
-                 // general plot data and undeformed mesh
+                // general plot data and undeformed mesh
                 InitStaticMesh();
                 // everything is ready, start calculation:
                 if (Param.Analyze)
                 {
                     K = new DenseMatrix(DoF); // global stiffness matrix
                     SSM = new DenseMatrix(DoF);
-                    
+
                     foreach (var ldc in LoadCases)
                     {
                         ldc.Solve(Members);
@@ -175,7 +175,7 @@ namespace Terwiel.Glaucon
         /// <summary>
         /// number of condensed degrees of freedom.
         /// </summary>
-        public int Cdof;
+        public static int Cdof;
 
         public double TotalMass;
         public double StructMass;
@@ -183,7 +183,7 @@ namespace Terwiel.Glaucon
         /// <summary>
         /// list of DoF's to condense.
         /// </summary>
-        public int[] DoFToCondense; // Size = DoF
+        public static int[] DoFsToCondense; // Size = DoF
 
         public List<ExtraNodeInertia> ExtraNodeInertias;
         public List<ExtraElementMass> ExtraElementMasses;
@@ -232,7 +232,7 @@ namespace Terwiel.Glaucon
         /// <summary>
         /// reaction data, total no. of restraints , partition of matrices
         /// </summary>
-        public static int FreePart;
+        public static int FreeCount;
 
         /// <summary>
         /// The number of degrees of freedom of the construction.
@@ -298,11 +298,12 @@ namespace Terwiel.Glaucon
 
         public int[] Index, RevIndex;
 
+        // use Permutation
         private const bool ReArrange = true;
 
         public static List<string> Errors = new();
 
-        public DenseMatrix Kc, Mc; // condensed stiffness and mass matrices
+        public static DenseMatrix Kc, Mc; // condensed stiffness and mass matrices
 
         public static double
             // x-increment for peak forces.
@@ -312,7 +313,7 @@ namespace Terwiel.Glaucon
             // positive including 0 do min/max
             //deltaX = -1, 
             Shift; // shift-factor for rigid-body-modes
-        
+
         public static int
             //BandWidth,
             MinRestraints, // nr of restrained DOFs
@@ -370,9 +371,9 @@ namespace Terwiel.Glaucon
         [Description("list of nodes to condense")]
         public List<CondensedNode> NodesToCondense { get; set; }
 
-       //  public List<NodeRestraint> NodesRestraints;
+        //  public List<NodeRestraint> NodesRestraints;
 
-        
+
 
         #endregion
 
@@ -420,7 +421,7 @@ namespace Terwiel.Glaucon
             }
             else
             { // InputSource = JSON
-                
+
                 //BaseFile = Path.GetFileNameWithoutExtension(Param.InputFileName);
                 if (!Directory.Exists(Param.InputPath))
                 {
@@ -465,44 +466,13 @@ namespace Terwiel.Glaucon
             s.Start();
 #endif
             //Lg(Param.title);
-            // adjust node, restraint and member numbers to base 0:
-            Nodes.Sort((i, j) => i.Nr.CompareTo(j.Nr));
-            int seqCheck = 0;
-            foreach (var nd in Nodes)
-            {
-                nd.Nr--;
-                SeqCheck(nd.Nr, "Node");
-                nd.Restraints = new[] { 0, 0, 0, 0, 0, 0 }; //ALL free
-            }
-            Members.Sort((i, j) => i.Nr.CompareTo(j.Nr));
-            seqCheck = 0;
-            foreach (var mbr in Members)
-            {
-                mbr.Nr--;
-                //nA and nB were decremented in the constructor
-                mbr.NodeA = Nodes[mbr.nA];
-                mbr.NodeB = Nodes[mbr.nB];
-
-                SeqCheck(mbr.Nr, "Member");
-                mbr.Process(Nodes);
-            }
-            NodesRestraints.Sort((i, j) => i.NodeNr.CompareTo(j.NodeNr));
-            foreach (var nr in NodesRestraints)
-            {
-                nr.NodeNr--;
-            }
-
-            //var dim = new int[3];
+            //// adjust node, restraint and member numbers to base 0:           
+            ArrangeNodesAndNumbers();
+            
             Space = new char[3];
             int k = 0;
-            foreach (var nr in NodesRestraints)
-            {
-                Nodes[nr.NodeNr].Restraints = nr.Restraints;
-            }
-
             for (int i = 0; i < 3; i++)
             {
-                //dim[i] = Nodes.Any(x => x.Coord[i] != Nodes.First().Coord[i]);
                 if (Nodes.Any(x => x.Coord[i] != Nodes.First().Coord[i]))
                 {
                     Space[k++] = "XYZ"[i];
@@ -511,11 +481,11 @@ namespace Terwiel.Glaucon
 
             DoF = Nodes.Count * 6;// total number of degrees of freedom ( 6 per node)
             Lg($"{DoF} dregrees of freedom.");
-            
+
             Lg($"{NodesRestraints.Count} restrained nodes with one or more restrained DoFs.");
 
             int[] index = PartitionSystemMatrices();
-            
+
             // the lower part of this array comprise the free-to-move DoFs,
             // corresponding to the Kff partition in McGuire, formula 3.7 page 43 
 
@@ -565,15 +535,6 @@ namespace Terwiel.Glaucon
                 }
             }
 
-            void SeqCheck(int nr, string name)
-            {
-                if (seqCheck != nr)
-                {
-                    throw new ArgumentException($"{name} number {nr + 1} out of sequence");
-                }
-                seqCheck++;
-            }
-
             // Parallel.ForEach(members, mb => { mb.SetupGamma(nodes[mb.NodeA], nodes[mb.NodeB]); });
 
             // Param.Xincr = buffer.ReadDouble();
@@ -581,9 +542,10 @@ namespace Terwiel.Glaucon
 
             //Parallel.ForEach(members, (mb => { mb.SetupShearDeformationFactors(); }));
 
-            // # of load cases
-
+            // Process Load cse input data:
             Lg($"{LoadCases.Count} load cases.");
+
+            LoadCases.ForEach(ld => ld.ProcessData(Members, DoF));
 
             // number of desired dynamic modes of vibration = 3
             if (Param.DynamicModesCount > 0)
@@ -608,7 +570,7 @@ namespace Terwiel.Glaucon
 
             if (Param.ModalMethod != None)
             {
-                ReadCondensationData();
+                ProcessCondensationData();
             }
 #if DEBUG
             s.Stop();
@@ -616,16 +578,62 @@ namespace Terwiel.Glaucon
 #endif
         }
 
+        public void ArrangeNodesAndNumbers()
+        {
+            // adjust node, restraint and member numbers to base 0:
+            Nodes.Sort((i, j) => i.Nr.CompareTo(j.Nr));
+            int seqCheck = 0;
+            foreach (var nd in Nodes)
+            {
+                nd.Nr--;
+                SeqCheck(nd.Nr, "Node");
+                nd.Restraints = new[] { 0, 0, 0, 0, 0, 0 }; //ALL free
+            }
+            Members.Sort((i, j) => i.Nr.CompareTo(j.Nr));
+            seqCheck = 0;
+            foreach (var mbr in Members)
+            {
+                mbr.Nr--;
+                //nA and nB were decremented in the constructor
+                mbr.NodeA = Nodes[mbr.nA];
+                mbr.NodeB = Nodes[mbr.nB];
+
+                SeqCheck(mbr.Nr, "Member");
+                mbr.Process(Nodes);
+            }
+            NodesRestraints.Sort((i, j) => i.NodeNr.CompareTo(j.NodeNr));
+            foreach (var nr in NodesRestraints)
+            {
+                nr.NodeNr--;
+            }
+
+            foreach (var nr in NodesRestraints)
+            {
+                Nodes[nr.NodeNr].Restraints = nr.Restraints;
+            }
+
+            // local method:
+            void SeqCheck(int nr, string name)
+            {
+                if (seqCheck != nr)
+                {
+                    throw new ArgumentException($"{name} number {nr + 1} out of sequence");
+                }
+                seqCheck++;
+            }
+        }
+
         public int[] PartitionSystemMatrices()
         {
-             // now set up the DoF vector:
-            FreePart = DoF;
+            // now set up the DoF vector:
+            FreeCount = DoF;
             GlobalRestraints = new int[DoF];
             // NodeRestraints is a list of only restrained nodes
             foreach (var nr in NodesRestraints)
             {
                 var nodeNr = nr.NodeNr;
                 var restr = nr.Restraints; // int[6]
+                FreeCount -= restr.Sum(); // Count the zeros
                 for (var j = 0; j < 6; j++)
                 {
                     // read restraints: 0 = not restrained (free), other value = fixed = false.
@@ -634,7 +642,7 @@ namespace Terwiel.Glaucon
                     GlobalRestraints[(nodeNr * 6) + j] = n;
                     // one of the 6 degrees of freedon of the construction may not be
                     // unconstrained:
-                    FreePart -= n;
+                    //FreeCount -= n;
                 }
             }
 
@@ -642,10 +650,10 @@ namespace Terwiel.Glaucon
             // index[i] says where a vector element or matrix row/column should goes when permuting.
             var index = new int[DoF]; // use for Permutation
             var j1 = 0;
-            var j2 = FreePart;
+            var j2 = FreeCount;
             for (var i = 0; i < DoF; i++)
             {
-                index[GlobalRestraints[i] == 0 ? j1++ : j2++ ] = i;
+                index[GlobalRestraints[i] == 0 ? j1++ : j2++] = i;
                 //if (GlobalRestraints[i] == 0)
                 //{
                 //    index[j1] = i;

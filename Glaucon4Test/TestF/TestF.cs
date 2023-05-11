@@ -15,7 +15,7 @@ namespace UnitTestGlaucon
     [TestFixture]
     public partial class UnitTestF : UnitTestBase
     {
-         public DenseMatrix? deflection , Reactions, EndForces;
+        // public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestF()
         {            

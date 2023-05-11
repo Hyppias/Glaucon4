@@ -13,7 +13,7 @@ namespace UnitTestGlaucon
     {
         public const string pathName = @"E:\Users\erik\Documents\Visual Studio 2022\Projects\Glaucon4\Glaucon4Test\Resources\";
         public DenseMatrix? deflection, Reactions, EndForces;
-        public Glaucon Glaucon;
+        // public Glaucon Glaucon;
         // Use SetUp to run code before running the first test in the class
         [SetUp]
         public static void MyClassInitialize()

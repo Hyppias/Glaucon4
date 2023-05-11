@@ -210,6 +210,8 @@ namespace Terwiel.Glaucon
                 Jacobi(Kb, Mb, omega2, Qb); // (12.13)
 
                 //V =  Xb * Qb;
+                // V = (DenseMatrix) Xb.Multiply(Qb);
+
                 prodAB(Xb, Qb, V, DoF, m, m); // batheModes, batheModes);     // V = Xb Qb (12.14)
                 Eigsort(omega2, V, m);
                 //EigSort(omega2, V, 0, omega2.Count - 1);

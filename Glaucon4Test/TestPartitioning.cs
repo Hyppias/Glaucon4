@@ -25,9 +25,9 @@ namespace UnitTestGlaucon
                 },
                 Nodes = new List<Node>
                 {
-                    new( 0, new[]{  0.0   , 0.0    ,0.0    }, 0.0),
-                    new( 1, new[]{  120.0 , 0.0    ,0.0    }, 0.0),
-                    new( 2, new[]{  240.0 , 0.0    ,0.0    }, 0.0)
+                    new( 0, new[]{0.0,0,0 }, 0.0), // don't need coords
+                    new( 1, new[]{0.0,0,0 }, 0.0),
+                    new( 2, new[]{0.0,0,0 }, 0.0)
                 },
                 
             };
@@ -40,9 +40,9 @@ namespace UnitTestGlaucon
             // Act
             for(int i=0; i < DoF; i++)
             {
-                Assert.That(result[i] == new [] {5, 6,7, 11,12,13,  17,  0,1,2,3,4, 8,9,10,14,15,16 }[i] );
+                Assert.That(result[i] , Is.EqualTo(new [] {5,6,7,   11,12,13,17, 0,1,2,3,4, 8,9,10, 14,15,16}[i]), $"Index {i}, being {result[i]}, is out of range.");
             }
-            Assert.That(Glaucon.FreePart == 7);
+            Assert.That(Glaucon.FreeCount,Is.EqualTo(7),"There should be 7 free DoFs.");
 
         }
     }

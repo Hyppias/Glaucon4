@@ -14,8 +14,8 @@ using System.Reflection;
 namespace UnitTestGlaucon
 {
     public partial class UnitTestH : UnitTestBase 
-        {
-         public DenseMatrix? deflection , Reactions, EndForces;
+    {
+        // public DenseMatrix? deflection , Reactions, EndForces;
         [Test]
         public void TestH()
         {
